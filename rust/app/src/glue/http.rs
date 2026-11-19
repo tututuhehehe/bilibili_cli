@@ -14,6 +14,7 @@ pub struct FetchSpec<'a> {
     pub referer: Option<&'a str>,
     pub cookie: &'a str,
     pub post: Option<&'a str>,
+    pub jar: &'a str,
     pub channel: &'static str,
     pub allow_codes: &'a [i64],
 }
@@ -26,6 +27,7 @@ impl<'a> FetchSpec<'a> {
             referer: Some("https://www.bilibili.com/"),
             cookie: "",
             post: None,
+            jar: "",
             channel: "",
             allow_codes: &[],
         }
@@ -44,6 +46,18 @@ impl<'a> FetchSpec<'a> {
     }
     pub fn channel(mut self, c: &'static str) -> Self {
         self.channel = c;
+        self
+    }
+    pub fn post(mut self, p: Option<&'a str>) -> Self {
+        self.post = p;
+        self
+    }
+    pub fn allow_codes(mut self, codes: &'a [i64]) -> Self {
+        self.allow_codes = codes;
+        self
+    }
+    pub fn jar(mut self, j: &'a str) -> Self {
+        self.jar = j;
         self
     }
 }
@@ -65,6 +79,7 @@ pub fn fetch_json(url: &str, spec: &FetchSpec) -> Result<Value, Failure> {
     cs.referer = spec.referer;
     cs.cookie = spec.cookie;
     cs.post = spec.post;
+    cs.jar = spec.jar;
     let (body, http) = curl(url, &cs)?;
     let endpoint = endpoint_of(url);
 

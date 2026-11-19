@@ -13,7 +13,7 @@ fn sent_to_original(unit: &str) -> bool {
 pub fn dispatch(command: &str, matches: &ArgMatches) -> Option<ExitCode> {
     match command {
         "search" | "doctor" if !sent_to_original("PROTO") => Some(proto::run(command, matches)),
-        "list" if !sent_to_original("SIGN") => Some(sign::run(command, matches)),
+        "list" | "login" if !sent_to_original("SIGN") => Some(sign::run(command, matches)),
         "info" | "dl" if !sent_to_original("PLAY") => Some(play::run(command, matches)),
         _ => None,
     }

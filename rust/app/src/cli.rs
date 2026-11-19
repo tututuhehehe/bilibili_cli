@@ -84,6 +84,11 @@ pub fn command() -> Command {
                 .disable_help_flag(true),
         )
         .subcommand(
+            Command::new("login")
+                .disable_help_flag(true)
+                .arg(Arg::new("tv").long("tv").action(ArgAction::SetTrue)),
+        )
+        .subcommand(
             Command::new("dl")
                 .disable_help_flag(true)
                 .arg(

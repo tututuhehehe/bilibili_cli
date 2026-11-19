@@ -15,7 +15,17 @@ use crate::glue::err::{Failure, SCHEMA, fail_exit};
 use crate::glue::http::{user_name, user_videos, view};
 
 pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
-    debug_assert_eq!(command, "list");
+    if command == "login" {
+        let res = if matches.get_flag("tv") {
+            crate::glue::login::login_tv()
+        } else {
+            crate::glue::login::login_web()
+        };
+        return match res {
+            Ok(code) => ExitCode::from(code as u8),
+            Err(f) => fail_exit(f),
+        };
+    }
     let target = matches
         .get_one::<OsString>("target")
         .map(|s| s.to_string_lossy().into_owned())

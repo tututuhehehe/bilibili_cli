@@ -3,6 +3,8 @@
 
 use serde_json::{json, Value};
 
+use super::err::Failure;
+
 /// `CREDS_PATH`：`~/.bilibili_cli/creds.json`（模式 600，路径与字段不变，ADR-008）。
 fn creds_path() -> String {
     let home = std::env::var("HOME").unwrap_or_default();
@@ -61,4 +63,25 @@ pub fn qn_label(id: i64) -> String {
         16 => "360P".into(),
         other => other.to_string(),
     }
+}
+
+/// `save_creds`（bilibili_cli.py:262）：tmp 写入 → chmod 600 → 原子替换。
+pub fn save_creds(c: &Value) -> Result<(), Failure> {
+    let path = creds_path();
+    let dir = std::path::Path::new(&path)
+        .parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_default();
+    std::fs::create_dir_all(&dir).map_err(|e| Failure::Raw(format!("{e}")))?;
+    let tmp = format!("{path}.tmp");
+    let body = serde_json::to_string_pretty(c).unwrap_or_default();
+    std::fs::write(&tmp, body).map_err(|e| Failure::Raw(format!("{e}")))?;
+    #[allow(clippy::unnecessary_cast)]
+    std::fs::set_permissions(
+        &tmp,
+        std::os::unix::fs::PermissionsExt::from_mode(0o600 as u32),
+    )
+    .map_err(|e| Failure::Raw(format!("{e}")))?;
+    std::fs::rename(&tmp, &path).map_err(|e| Failure::Raw(format!("{e}")))?;
+    Ok(())
 }

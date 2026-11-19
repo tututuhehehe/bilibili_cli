@@ -7,4 +7,5 @@ pub mod download;
 pub mod err;
 pub mod grpc;
 pub mod http;
+pub mod login;
 pub mod play;
