@@ -57,6 +57,14 @@ impl<'a> CurlSpec<'a> {
         self.post = p;
         self
     }
+    pub fn save_to(mut self, d: &'a str) -> Self {
+        self.save_to = Some(d);
+        self
+    }
+    pub fn resume(mut self, r: bool) -> Self {
+        self.resume = r;
+        self
+    }
 }
 
 fn endpoint_of(url: &str) -> String {

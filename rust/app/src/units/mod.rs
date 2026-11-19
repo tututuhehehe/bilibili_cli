@@ -17,7 +17,7 @@ pub fn dispatch(command: &str, matches: &ArgMatches) -> Option<ExitCode> {
     match command {
         "search" if !sent_to_original("PROTO") => Some(proto::run(command, matches)),
         "list" if !sent_to_original("SIGN") => Some(sign::run(command, matches)),
-        "info" if !sent_to_original("PLAY") => Some(play::run(command, matches)),
+        "dl" if !sent_to_original("PLAY") => Some(play::run(command, matches)),
         _ => None,
     }
 }

@@ -5,7 +5,8 @@
     "help",
     "search",
     "list",
-    "info"
+    "info",
+    "dl"
   ],
   "units": [
     {
@@ -31,7 +32,7 @@
       "crate": "play-rs",
       "path": "../play",
       "commands": [
-        "info"
+        "dl"
       ],
       "switch": "RUST_ANYTHING_UNIT_PLAY"
     }

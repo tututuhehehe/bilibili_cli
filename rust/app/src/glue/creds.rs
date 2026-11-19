@@ -32,6 +32,16 @@ pub fn load_creds() -> Value {
     c
 }
 
+/// `ACCESS_TEXT`（bilibili_cli.py:498）。
+pub fn access_text(state: &str) -> &'static str {
+    match state {
+        "yes" => "可播放",
+        "limited" => "仅低清晰度（未登录或权益不足）",
+        "no" => "无播放权限",
+        _ => "未知",
+    }
+}
+
 pub const TV_KEY: &str = "4409e2ce8ffd12b8";
 pub const TV_SEC: &str = "59b43e04ad6965f34319062b478f83dd";
 

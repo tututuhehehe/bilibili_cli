@@ -79,4 +79,41 @@ pub fn command() -> Command {
                 )
                 .arg(Arg::new("json").long("json").action(ArgAction::SetTrue)),
         )
+        .subcommand(
+            Command::new("dl")
+                .disable_help_flag(true)
+                .arg(
+                    Arg::new("target")
+                        .required(true)
+                        .num_args(1)
+                        .value_parser(value_parser!(OsString)),
+                )
+                .arg(Arg::new("audio").long("audio").action(ArgAction::SetTrue))
+                .arg(
+                    Arg::new("quality")
+                        .long("quality")
+                        .num_args(1)
+                        .value_parser(value_parser!(OsString)),
+                )
+                .arg(
+                    Arg::new("codec")
+                        .long("codec")
+                        .default_value("avc")
+                        .value_parser(["avc", "hevc", "av1"]),
+                )
+                .arg(
+                    Arg::new("out")
+                        .short('o')
+                        .long("out")
+                        .num_args(1)
+                        .value_parser(value_parser!(OsString)),
+                )
+                .arg(Arg::new("subs").long("subs").action(ArgAction::SetTrue))
+                .arg(
+                    Arg::new("keep_parts")
+                        .long("keep-parts")
+                        .action(ArgAction::SetTrue),
+                )
+                .arg(Arg::new("json").long("json").action(ArgAction::SetTrue)),
+        )
 }

@@ -3,6 +3,7 @@
 
 pub mod curl;
 pub mod creds;
+pub mod download;
 pub mod err;
 pub mod grpc;
 pub mod http;
