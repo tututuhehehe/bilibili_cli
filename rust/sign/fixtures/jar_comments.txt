@@ -1,0 +1,6 @@
+# Netscape HTTP Cookie File
+# https://curl.se/docs/http-cookies.html
+#
+# 提到 #HttpOnly_ 的普通注释行，应被跳过：
+
+#HttpOnly_ 这行其实只是注释

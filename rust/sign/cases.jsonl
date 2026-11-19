@@ -4,3 +4,7 @@
 {"fn": "cookie_header", "args": [{"other": 1}], "ok": ""}
 {"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/jar1.txt"], "ok": {"SESSDATA": "synthetic_secret_1", "buvid3": "synthetic_buvid", "bili_jct": "synthetic_jct"}}
 {"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/不存在的文件.txt"], "ok": {}}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/jar_empty.txt"], "ok": {}}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/jar_comments.txt"], "ok": {}}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/jar_mixed.txt"], "ok": {"SESSDATA": "mixed_secret", "DedeUserID": "never_expires_zero", "buvid3": "ts_in_past", "bili_jct": "httponly_past_ts", "buvid4": "ts_in_future"}}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/jar_malformed.txt"], "ok": {"extra": "segment", "trailing": "value", "dup": "second_value", "": "value_after_empty_name", "crlf": "crlf_value"}}

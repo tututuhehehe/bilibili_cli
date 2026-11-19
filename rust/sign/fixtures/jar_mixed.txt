@@ -1,0 +1,5 @@
+#HttpOnly_.bilibili.com	TRUE	/	TRUE	0	SESSDATA	mixed_secret
+.bilibili.com	TRUE	/	TRUE	0	DedeUserID	never_expires_zero
+.bilibili.com	TRUE	/	FALSE	1700000000	buvid3	ts_in_past
+#HttpOnly_.api.bilibili.com	TRUE	/	TRUE	1735689600	bili_jct	httponly_past_ts
+.bilibili.com	TRUE	/	TRUE	9999999999	buvid4	ts_in_future
