@@ -11,5 +11,8 @@ path = "src/main.rs"
 
 [dependencies]
 clap = "4"
+parse-rs = { path = "../parse" }
+proto-rs = { path = "../proto" }
+serde_json = { version = "1", features = ["preserve_order"] }
 
 [workspace]

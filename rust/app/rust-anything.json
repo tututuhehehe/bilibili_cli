@@ -2,7 +2,18 @@
   "schema": "rust-anything/front-door@1",
   "name": "bilibili_cli",
   "commands": [
-    "help"
+    "help",
+    "search"
   ],
-  "units": []
+  "units": [
+    {
+      "name": "proto",
+      "crate": "proto-rs",
+      "path": "../proto",
+      "commands": [
+        "search"
+      ],
+      "switch": "RUST_ANYTHING_UNIT_PROTO"
+    }
+  ]
 }

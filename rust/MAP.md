@@ -15,11 +15,14 @@
 状态流：`open` → `claimed by <会话> <日期>` → `done`（回填 gate/diff 结果）。
 
 ## wave 2 胶水（协调者写，存 rust/app/src/）
-curl 封装 + CliError/错误分层/report（LABELS/CURL_EXIT/BIZ_CODES/HINTS）；
-fetch_json；grpc_call；view/user_videos/user_name；playurl；
-_curl_dl/_merge（断点续传 + 半成品必删）；_render_qr（qrencode/uv/open 链）；
-login_web/login_tv；load_creds/save_creds；
-cmd_search/list/info/dl/doctor/help + clap 补全 + HELP 文本 + main。
+- ✅ **search 已接线**（units/proto.rs + glue/{err,curl,grpc}.rs）：
+  真实冒烟 py/rust 配对 10+ 次全一致（--json / 人类输出 / --users --desc / --sort new / 空结果）；
+  回落日志为空（纯 Rust 路径）；kill switch `RUST_ANYTHING_UNIT_PROTO=original` 有效。
+  注意：app-cases 里的 search 用例全是参数错路径，仍由 Python 回落答（符合 ADR-003），
+  search 的真实行为由冒烟配对作证。
+- 待做：curl 封装已就绪，待接 list / info / dl / doctor / login；
+  view/user_videos/user_name；playurl；_curl_dl/_merge；_render_qr；load_creds/save_creds；
+  cmd_list/info/dl/doctor + clap 补全 + HELP 文本。
 
 ## wave 3 冒烟（协调者跑，用户配合一次）
 search 1 次 / `list --json --rights` 1 次 / info 1 次 / doctor；
@@ -30,6 +33,8 @@ fallback 率 0 + 4 单元 gate 全绿 + 冒烟全过 → `rust/app` 纯化 →
 `bilibili_cli.py` 移 `legacy/`，README 重写。
 
 ## 已解决的坑（别再踩）
+- **搜索排序会实时抖动**（totalrank 第 2 条起会变，py 自比也不稳定）：
+  验收一律用「配对对比」，勿单次 diff 下结论。
 - record 生成用例喂垃圾输入会触发 `die()`→SystemExit 杀录制进程
   → 一律 `--count 0 --inputs inputs.jsonl`。
 - bridge 模板 lib 名默认 `bilibili_cli_rs` → 已改 `[lib] name = <module>`。

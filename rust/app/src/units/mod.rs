@@ -4,6 +4,16 @@ use std::process::ExitCode;
 
 use clap::ArgMatches;
 
-pub fn dispatch(_command: &str, _matches: &ArgMatches) -> Option<ExitCode> {
-    None
+mod proto;
+
+/// `RUST_ANYTHING_UNIT_<NAME>=original` sends that unit back to the original.
+fn sent_to_original(unit: &str) -> bool {
+    std::env::var(format!("RUST_ANYTHING_UNIT_{unit}")).is_ok_and(|v| v == "original")
+}
+
+pub fn dispatch(command: &str, matches: &ArgMatches) -> Option<ExitCode> {
+    match command {
+        "search" if !sent_to_original("PROTO") => Some(proto::run(command, matches)),
+        _ => None,
+    }
 }
