@@ -40,6 +40,13 @@
         "dl"
       ],
       "switch": "RUST_ANYTHING_UNIT_PLAY"
+    },
+    {
+      "name": "parse",
+      "crate": "parse-rs",
+      "path": "../parse",
+      "commands": [],
+      "switch": "RUST_ANYTHING_UNIT_PARSE"
     }
   ]
 }

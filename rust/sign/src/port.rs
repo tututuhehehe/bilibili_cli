@@ -3,8 +3,7 @@
 #![forbid(unsafe_code)]
 
 /// 纯 Rust MD5（源码用 `hashlib.md5`；依赖纪律禁新增 crate，见 md5.rs 头注释）。
-#[path = "md5.rs"]
-mod md5;
+use crate::md5;
 
 use serde_json::{Map, Value, json};
 use std::path::Path;

@@ -10,7 +10,7 @@ use std::time::Duration;
 use serde_json::Value;
 use sign::port as sign_;
 
-use super::curl::{curl, CurlSpec};
+use super::curl::{CurlSpec, curl};
 use super::err::{CliError, Failure};
 use super::http::fetch_json;
 
@@ -57,10 +57,7 @@ pub fn curl_dl(url: &str, dest: &Path, referer: &str) -> Result<(), Failure> {
             Err(e) => last = Some(e),
         }
         let got = std::fs::metadata(dest).map(|m| m.len()).unwrap_or(0);
-        let summary = last
-            .as_ref()
-            .map(|e| e.summary.clone())
-            .unwrap_or_default();
+        let summary = last.as_ref().map(|e| e.summary.clone()).unwrap_or_default();
         eprintln!(
             "  · 下载中断（第 {}/3 次，已 {} MB）：{summary} → 续传重试",
             i + 1,
@@ -78,15 +75,14 @@ pub fn curl_dl(url: &str, dest: &Path, referer: &str) -> Result<(), Failure> {
 /// `_merge`（bilibili_cli.py:640）。
 pub fn merge(video: &Path, audio: &Path, out: &Path) -> Result<(), Failure> {
     let Some(ff) = which("ffmpeg") else {
-        return Err(CliError::new("missing", "没有 ffmpeg，无法合并音视频（brew install ffmpeg）").into());
+        return Err(CliError::new(
+            "missing",
+            "没有 ffmpeg，无法合并音视频（brew install ffmpeg）",
+        )
+        .into());
     };
     let p = Command::new(&ff)
-        .args([
-            "-y",
-            "-loglevel",
-            "error",
-            "-i",
-        ])
+        .args(["-y", "-loglevel", "error", "-i"])
         .arg(video)
         .arg("-i")
         .arg(audio)
@@ -103,20 +99,16 @@ pub fn merge(video: &Path, audio: &Path, out: &Path) -> Result<(), Failure> {
 }
 
 /// `_save_subs`（bilibili_cli.py:768）：每条字幕独立容错，失败静默跳过。
-pub fn save_subs(
-    bvid: &str,
-    cid: i64,
-    stem: &Path,
-    creds: &Value,
-    referer: &str,
-) {
+pub fn save_subs(bvid: &str, cid: i64, stem: &Path, creds: &Value, referer: &str) {
     let cookie = match sign_::cookie_header(creds.clone()) {
         Ok(c) => c,
         Err(_) => return,
     };
     let j = match fetch_json(
         &format!("https://api.bilibili.com/x/player/v2?bvid={bvid}&cid={cid}"),
-        &super::http::FetchSpec::new().referer(Some(referer)).cookie(&cookie),
+        &super::http::FetchSpec::new()
+            .referer(Some(referer))
+            .cookie(&cookie),
     ) {
         Ok(j) => j,
         Err(_) => return,
@@ -132,7 +124,11 @@ pub fn save_subs(
             .and_then(|x| x.as_str())
             .unwrap_or("")
             .to_string();
-        let lang = if lang.is_empty() { format!("sub{i}") } else { lang };
+        let lang = if lang.is_empty() {
+            format!("sub{i}")
+        } else {
+            lang
+        };
         let mut url = s
             .get("subtitle_url")
             .and_then(|x| x.as_str())
@@ -170,7 +166,12 @@ pub fn save_subs(
         let path = stem.with_extension(format!("{lang}.srt"));
         if let Ok(mut f) = std::fs::File::create(&path) {
             let _ = f.write_all(lines.join("\n").as_bytes());
-            println!("  字幕 {}", path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default());
+            println!(
+                "  字幕 {}",
+                path.file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_default()
+            );
         }
     }
 }
@@ -307,12 +308,7 @@ fn concat_parts(parts: &[PathBuf], dest: &Path, total: u64) -> Result<(), String
 /// 分段并行下载一条流（ADR-014）。
 /// parallel ≤ 1 / 文件小于阈值 / 无 Range 支持 → 单流；
 /// 任一段最终失败或拼接异常 → 删全部半成品 → 回退单流（自带重试与必删语义）。
-pub fn download_track(
-    url: &str,
-    dest: &Path,
-    referer: &str,
-    parallel: i64,
-) -> Result<(), Failure> {
+pub fn download_track(url: &str, dest: &Path, referer: &str, parallel: i64) -> Result<(), Failure> {
     if parallel <= 1 {
         return curl_dl(url, dest, referer);
     }
@@ -322,7 +318,7 @@ pub fn download_track(
     if total < PARALLEL_THRESHOLD {
         return curl_dl(url, dest, referer);
     }
-    let n = parallel.min(MAX_PARALLEL).max(2) as u64;
+    let n = parallel.clamp(2, MAX_PARALLEL) as u64;
     let parts: Vec<(u64, u64)> = (0..n)
         .map(|i| (total * i / n, total * (i + 1) / n - 1))
         .collect();
@@ -383,7 +379,9 @@ mod parallel_tests {
         assert!(r.is_err(), "403 流必须失败");
         assert!(!dest.exists(), "回退单流失败后半成品必须删除");
         assert!(
-            !std::env::temp_dir().join("bcli_dl_track_404.m4s.part0").exists(),
+            !std::env::temp_dir()
+                .join("bcli_dl_track_404.m4s.part0")
+                .exists(),
             "分段半成品必须删除"
         );
     }

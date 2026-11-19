@@ -1,12 +1,12 @@
 //! REST 层：`fetch_json` / `view` / `user_videos` / `user_name`
 //! （bilibili_cli.py:204 / 456 / 464 / 479），错误分类逐字对齐。
 
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 
 use sign::port;
 
-use super::curl::{curl, CurlSpec, UA_APP};
-use super::err::{biz_code, CliError, Failure};
+use super::curl::{CurlSpec, UA_APP, curl};
+use super::err::{CliError, Failure, biz_code};
 
 #[derive(Default)]
 pub struct FetchSpec<'a> {
@@ -118,7 +118,7 @@ pub fn fetch_json(url: &str, spec: &FetchSpec) -> Result<Value, Failure> {
     if code == Some(0) || code.is_some_and(|c| spec.allow_codes.contains(&c)) {
         return Ok(j);
     }
-    let (cat, msg, raw) = match code.and_then(|c| biz_code(c)) {
+    let (cat, msg, raw) = match code.and_then(biz_code) {
         Some((cat, m)) => (
             cat,
             m.to_string(),
@@ -165,7 +165,10 @@ pub fn view(bvid: &str) -> Result<Value, Failure> {
     match j.get("data") {
         Some(d @ Value::Object(_)) => Ok(d.clone()),
         _ => Err(CliError::new("interface", "view 接口没有 data 字段")
-            .raw(take_chars(&serde_json::to_string(&j).unwrap_or_default(), 200))
+            .raw(take_chars(
+                &serde_json::to_string(&j).unwrap_or_default(),
+                200,
+            ))
             .into()),
     }
 }
@@ -186,10 +189,7 @@ pub fn user_videos(uid: &str, n: i64) -> Result<Value, Failure> {
     });
     let q = port::sign_app(params, None, None).map_err(Failure::Raw)?;
     let url = format!("https://app.bilibili.com/x/v2/space/archive/cursor?{q}");
-    let j = fetch_json(
-        &url,
-        &FetchSpec::new().ua(UA_APP).referer(Some("")),
-    )?;
+    let j = fetch_json(&url, &FetchSpec::new().ua(UA_APP).referer(Some("")))?;
     let d = j.get("data");
     let items = d
         .and_then(|d| d.get("item"))
@@ -202,15 +202,15 @@ pub fn user_videos(uid: &str, n: i64) -> Result<Value, Failure> {
         .into_iter()
         .filter(|it| {
             it.get("goto").and_then(|g| g.as_str()) == Some("av")
-                && it.get("bvid").and_then(|b| b.as_str()).is_some_and(|b| !b.is_empty())
+                && it
+                    .get("bvid")
+                    .and_then(|b| b.as_str())
+                    .is_some_and(|b| !b.is_empty())
         })
-        .take({
-            let keep = if n >= 0 {
-                n as usize
-            } else {
-                raw_len.saturating_sub((-n) as usize)
-            };
-            keep
+        .take(if n >= 0 {
+            n as usize
+        } else {
+            raw_len.saturating_sub((-n) as usize)
         })
         .collect();
     let d_obj = j.get("data").is_some_and(|x| x.is_object());
@@ -220,12 +220,14 @@ pub fn user_videos(uid: &str, n: i64) -> Result<Value, Failure> {
             .and_then(|x| x.as_object())
             .map(|o| o.keys().cloned().collect())
             .unwrap_or_default();
-        return Err(CliError::new("interface", "投稿接口结构变了（缺少 data.item）")
-            .raw(take_chars(
-                &serde_json::to_string(&keys).unwrap_or_default(),
-                160,
-            ))
-            .into());
+        return Err(
+            CliError::new("interface", "投稿接口结构变了（缺少 data.item）")
+                .raw(take_chars(
+                    &serde_json::to_string(&keys).unwrap_or_default(),
+                    160,
+                ))
+                .into(),
+        );
     }
     let total = d
         .and_then(|x| x.get("count"))

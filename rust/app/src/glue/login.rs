@@ -6,14 +6,14 @@ use std::process::Command;
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 use sign::port as sign_port;
 
-use super::creds::{load_creds, save_creds, TV_KEY, TV_SEC};
+use super::creds::{TV_KEY, TV_SEC, load_creds, save_creds};
 use super::curl::{UA_TV, UA_WEB};
 use super::download::which;
 use super::err::{CliError, Failure};
-use super::http::{fetch_json, nav_name, FetchSpec};
+use super::http::{FetchSpec, fetch_json, nav_name};
 
 fn now_ts() -> i64 {
     std::time::SystemTime::now()
@@ -26,19 +26,17 @@ fn now_ts() -> i64 {
 fn render_qr(text: &str) -> bool {
     let qr = which("qrencode");
     let tty = std::io::stdout().is_terminal();
-    if let Some(qr) = qr.as_deref() {
-        if tty {
-            if let Ok(out) = Command::new(qr)
-                .args(["-t", "ANSIUTF8", "-m", "1"])
-                .arg(text)
-                .output()
-            {
-                let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
-                if out.status.success() && !stdout.is_empty() {
-                    println!("{stdout}");
-                    return true;
-                }
-            }
+    if let Some(qr) = qr.as_deref()
+        && tty
+        && let Ok(out) = Command::new(qr)
+            .args(["-t", "ANSIUTF8", "-m", "1"])
+            .arg(text)
+            .output()
+    {
+        let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
+        if out.status.success() && !stdout.is_empty() {
+            println!("{stdout}");
+            return true;
         }
     }
     if which("uv").is_some() {
@@ -50,25 +48,24 @@ fn render_qr(text: &str) -> bool {
             .arg(text)
             .arg(png)
             .output()
+            && out.status.success()
+            && std::path::Path::new(png).is_file()
         {
-            if out.status.success() && std::path::Path::new(png).is_file() {
-                println!("（非终端环境，已生成二维码图片并打开：{png}）");
-                let _ = Command::new("open").arg(png).status();
-                return true;
-            }
+            println!("（非终端环境，已生成二维码图片并打开：{png}）");
+            let _ = Command::new("open").arg(png).status();
+            return true;
         }
     }
-    if let Some(qr) = qr.as_deref() {
-        if let Ok(out) = Command::new(qr)
+    if let Some(qr) = qr.as_deref()
+        && let Ok(out) = Command::new(qr)
             .args(["-t", "UTF8", "-m", "1"])
             .arg(text)
             .output()
-        {
-            let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
-            if out.status.success() && !stdout.is_empty() {
-                println!("{stdout}");
-                return true;
-            }
+    {
+        let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
+        if out.status.success() && !stdout.is_empty() {
+            println!("{stdout}");
+            return true;
         }
     }
     false
@@ -119,7 +116,9 @@ pub fn login_web() -> Result<u32, Failure> {
         sleep(Duration::from_secs(2));
         // poll 必须在 cookie jar 下请求，Set-Cookie（SESSDATA）才会落到 jar 里
         let j = fetch_json(
-            &format!("https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key={key}"),
+            &format!(
+                "https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key={key}"
+            ),
             &FetchSpec::new().jar(jar),
         )?;
         let d = j.get("data").cloned().unwrap_or(json!({}));
@@ -135,10 +134,7 @@ pub fn login_web() -> Result<u32, Failure> {
         }
         if code == Some(0) {
             let pairs = sign_port::_read_jar(jar.to_string()).map_err(Failure::Raw)?;
-            let sess = pairs
-                .get("SESSDATA")
-                .and_then(|x| x.as_str())
-                .unwrap_or("");
+            let sess = pairs.get("SESSDATA").and_then(|x| x.as_str()).unwrap_or("");
             if sess.is_empty() {
                 let raw = match pairs.as_object() {
                     Some(o) if !o.is_empty() => o.keys().cloned().collect::<Vec<_>>().join(", "),
@@ -155,9 +151,7 @@ pub fn login_web() -> Result<u32, Failure> {
                 .as_object()
                 .map(|o| {
                     o.iter()
-                        .map(|(k, v)| {
-                            format!("{k}={}", v.as_str().unwrap_or(""))
-                        })
+                        .map(|(k, v)| format!("{k}={}", v.as_str().unwrap_or("")))
                         .collect::<Vec<_>>()
                         .join("; ")
                 })
@@ -170,7 +164,11 @@ pub fn login_web() -> Result<u32, Failure> {
             }
             save_creds(&c)?;
             let who = nav_name(&cookie_str)?;
-            let who_disp = if who.is_empty() { String::new() } else { format!("：{who}") };
+            let who_disp = if who.is_empty() {
+                String::new()
+            } else {
+                format!("：{who}")
+            };
             println!("\n✓ 网页登录成功{who_disp}");
             let n = pairs.as_object().map(|o| o.len()).unwrap_or(0);
             println!("  cookie 已存 ~/.bilibili_cli/creds.json（{n} 项，权限 600）");
@@ -185,12 +183,8 @@ pub fn login_web() -> Result<u32, Failure> {
 /// `login_tv`（bilibili_cli.py:375）。
 pub fn login_tv() -> Result<u32, Failure> {
     let params = json!({"local_id": "0"});
-    let q = sign_port::sign_app(
-        params,
-        Some(json!(TV_KEY)),
-        Some(json!(TV_SEC)),
-    )
-    .map_err(Failure::Raw)?;
+    let q = sign_port::sign_app(params, Some(json!(TV_KEY)), Some(json!(TV_SEC)))
+        .map_err(Failure::Raw)?;
     let gen_resp = fetch_json(
         "https://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code",
         &FetchSpec::new().ua(UA_TV).referer(Some("")).post(Some(&q)),
@@ -230,12 +224,8 @@ pub fn login_tv() -> Result<u32, Failure> {
         }
         sleep(Duration::from_secs(2));
         let p = json!({"auth_code": auth_code, "local_id": "0"});
-        let body = sign_port::sign_app(
-            p,
-            Some(json!(TV_KEY)),
-            Some(json!(TV_SEC)),
-        )
-        .map_err(Failure::Raw)?;
+        let body = sign_port::sign_app(p, Some(json!(TV_KEY)), Some(json!(TV_SEC)))
+            .map_err(Failure::Raw)?;
         let j = fetch_json(
             "https://passport.bilibili.com/x/passport-tv-login/qrcode/poll",
             &FetchSpec::new()
@@ -285,7 +275,11 @@ pub fn login_tv() -> Result<u32, Failure> {
         if state == 86038 {
             return Err(CliError::new("auth", "TV 二维码已过期，请重新执行 login --tv").into());
         }
-        let msg_disp = if msg.is_empty() { "未知".to_string() } else { msg.clone() };
+        let msg_disp = if msg.is_empty() {
+            "未知".to_string()
+        } else {
+            msg.clone()
+        };
         return Err(CliError::new("auth", format!("TV 登录失败（{state}）：{msg_disp}")).into());
     }
 }

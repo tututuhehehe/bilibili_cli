@@ -76,8 +76,7 @@ fn cmd_doctor() -> Result<u32, Failure> {
     } else {
         println!("  · 未登录网页（只能拿 480P）");
     }
-    if c
-        .get("tv_access_token")
+    if c.get("tv_access_token")
         .and_then(|x| x.as_str())
         .is_some_and(|t| !t.is_empty())
     {

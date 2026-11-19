@@ -4,8 +4,7 @@
 //! `Err`（载荷 = die 的 msg 原文，app 层负责打印与退出码），见已知差异。
 #![forbid(unsafe_code)]
 
-#[path = "pystr.rs"]
-mod pystr;
+use crate::pystr;
 
 use serde_json::{Value, json};
 

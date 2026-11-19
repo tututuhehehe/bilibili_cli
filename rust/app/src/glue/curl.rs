@@ -2,7 +2,7 @@
 
 use std::process::Command;
 
-use super::err::{curl_exit, CliError};
+use super::err::{CliError, curl_exit};
 
 pub const UA_WEB: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 pub const UA_APP: &str =
@@ -39,24 +39,12 @@ impl<'a> CurlSpec<'a> {
             range: None,
         }
     }
-    pub fn ua(mut self, ua: &'a str) -> Self {
-        self.ua = Some(ua);
-        self
-    }
     pub fn referer(mut self, r: Option<&'a str>) -> Self {
         self.referer = r;
         self
     }
     pub fn timeout(mut self, t: u64) -> Self {
         self.timeout = t;
-        self
-    }
-    pub fn cookie(mut self, c: &'a str) -> Self {
-        self.cookie = c;
-        self
-    }
-    pub fn post(mut self, p: Option<&'a str>) -> Self {
-        self.post = p;
         self
     }
     pub fn save_to(mut self, d: &'a str) -> Self {
@@ -91,11 +79,11 @@ pub fn curl(url: &str, spec: &CurlSpec) -> Result<(String, i64), CliError> {
         "-A".into(),
         ua.into(),
     ];
-    if let Some(r) = spec.referer {
-        if !r.is_empty() {
-            cmd.push("-H".into());
-            cmd.push(format!("Referer: {r}"));
-        }
+    if let Some(r) = spec.referer
+        && !r.is_empty()
+    {
+        cmd.push("-H".into());
+        cmd.push(format!("Referer: {r}"));
     }
     cmd.push("-H".into());
     cmd.push("Accept: application/json, text/plain, */*".into());
@@ -142,9 +130,12 @@ pub fn curl(url: &str, spec: &CurlSpec) -> Result<(String, i64), CliError> {
     }
     cmd.push(url.into());
 
-    let out = Command::new(&cmd[0]).args(&cmd[1..]).output().map_err(|e| {
-        CliError::new("network", format!("curl 启动失败：{e}")).endpoint(endpoint_of(url))
-    })?;
+    let out = Command::new(&cmd[0])
+        .args(&cmd[1..])
+        .output()
+        .map_err(|e| {
+            CliError::new("network", format!("curl 启动失败：{e}")).endpoint(endpoint_of(url))
+        })?;
     let rc = out.status.code().unwrap_or(-1);
     if rc != 0 {
         let stderr_txt = String::from_utf8_lossy(&out.stderr);

@@ -7,7 +7,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use proto::{pb, port};
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 
 use super::err::{CliError, Failure};
 
@@ -37,12 +37,13 @@ fn percent_decode(s: &str) -> String {
     let mut out: Vec<u8> = Vec::with_capacity(bytes.len());
     let mut i = 0;
     while i < bytes.len() {
-        if bytes[i] == b'%' && i + 2 < bytes.len() {
-            if let Ok(b) = u8::from_str_radix(&s[i + 1..i + 3], 16) {
-                out.push(b);
-                i += 3;
-                continue;
-            }
+        if bytes[i] == b'%'
+            && i + 2 < bytes.len()
+            && let Ok(b) = u8::from_str_radix(&s[i + 1..i + 3], 16)
+        {
+            out.push(b);
+            i += 3;
+            continue;
         }
         out.push(bytes[i]);
         i += 1;
@@ -52,7 +53,10 @@ fn percent_decode(s: &str) -> String {
 
 fn temp_paths(tag: &str) -> (std::path::PathBuf, std::path::PathBuf) {
     let dir = std::env::temp_dir();
-    (dir.join(format!("{tag}.req")), dir.join(format!("{tag}.out")))
+    (
+        dir.join(format!("{tag}.req")),
+        dir.join(format!("{tag}.out")),
+    )
 }
 
 /// `grpc_call`（bilibili_cli.py:1217）：unary 请求，返回去帧后的 message 字节。
@@ -116,16 +120,20 @@ pub fn grpc_call(path: &str, payload: &[u8], timeout: u64) -> Result<Vec<u8>, Fa
     for line in head.lines() {
         let low = line.to_ascii_lowercase();
         if low.starts_with("grpc-status:") {
-            status = line.split_once(':').map(|(_, v)| v.trim()).unwrap_or("").into();
+            status = line
+                .split_once(':')
+                .map(|(_, v)| v.trim())
+                .unwrap_or("")
+                .into();
         } else if low.starts_with("grpc-message:") {
             let raw = line.split_once(':').map(|(_, v)| v.trim()).unwrap_or("");
             message = percent_decode(raw);
         }
     }
     if !status.is_empty() && status != "0" {
-        let code: i64 = status
-            .parse()
-            .map_err(|_| Failure::Raw(format!("ValueError: invalid literal for int(): {status:?}")))?;
+        let code: i64 = status.parse().map_err(|_| {
+            Failure::Raw(format!("ValueError: invalid literal for int(): {status:?}"))
+        })?;
         let cat = match code {
             3 | 12 => "interface",
             8 | 13 => "server",
@@ -134,7 +142,14 @@ pub fn grpc_call(path: &str, payload: &[u8], timeout: u64) -> Result<Vec<u8>, Fa
         };
         return Err(CliError::new(
             cat,
-            format!("gRPC {code}：{}", if message.is_empty() { "无说明".into() } else { message }),
+            format!(
+                "gRPC {code}：{}",
+                if message.is_empty() {
+                    "无说明".into()
+                } else {
+                    message
+                }
+            ),
         )
         .endpoint(path)
         .code(code)
@@ -201,20 +216,26 @@ pub fn grpc_search(
         pages += 1;
         let mut pag = bytes_of(&port::_pi(1, per).map_err(Failure::Raw)?)?;
         if !nxt.is_empty() {
-            pag.extend_from_slice(&bytes_of(&port::_ps(2, nxt.clone()).map_err(Failure::Raw)?)?);
+            pag.extend_from_slice(&bytes_of(
+                &port::_ps(2, nxt.clone()).map_err(Failure::Raw)?,
+            )?);
         }
         let fields = if users {
-            let mut req =
-                bytes_of(&port::_pi(1, SEARCH_TYPE_USER).map_err(Failure::Raw)?)?;
-            req.extend_from_slice(&bytes_of(&port::_ps(2, keyword.to_string()).map_err(Failure::Raw)?)?);
-            req.extend_from_slice(&bytes_of(&port::_pm(7, json!({ "$bytes": pag })).map_err(Failure::Raw)?)?);
+            let mut req = bytes_of(&port::_pi(1, SEARCH_TYPE_USER).map_err(Failure::Raw)?)?;
+            req.extend_from_slice(&bytes_of(
+                &port::_ps(2, keyword.to_string()).map_err(Failure::Raw)?,
+            )?);
+            req.extend_from_slice(&bytes_of(
+                &port::_pm(7, json!({ "$bytes": pag })).map_err(Failure::Raw)?,
+            )?);
             pb::pread(&grpc_call(SVC_SEARCH_TYPE, &req, 20)?).map_err(Failure::Raw)?
         } else {
             let order = sort_app(sort);
-            let mut req =
-                bytes_of(&port::_ps(1, keyword.to_string()).map_err(Failure::Raw)?)?;
+            let mut req = bytes_of(&port::_ps(1, keyword.to_string()).map_err(Failure::Raw)?)?;
             req.extend_from_slice(&bytes_of(&port::_pi(2, order).map_err(Failure::Raw)?)?);
-            req.extend_from_slice(&bytes_of(&port::_pm(10, json!({ "$bytes": pag })).map_err(Failure::Raw)?)?);
+            req.extend_from_slice(&bytes_of(
+                &port::_pm(10, json!({ "$bytes": pag })).map_err(Failure::Raw)?,
+            )?);
             pb::pread(&grpc_call(SVC_SEARCH, &req, 20)?).map_err(Failure::Raw)?
         };
         let (cards, pag_field) = if users {
@@ -250,7 +271,11 @@ pub fn grpc_search(
     out.truncate(want);
     if with_desc && !users {
         for one in out.iter_mut() {
-            let bvid = one.get("bvid").and_then(|b| b.as_str()).unwrap_or("").to_string();
+            let bvid = one
+                .get("bvid")
+                .and_then(|b| b.as_str())
+                .unwrap_or("")
+                .to_string();
             if bvid.is_empty() {
                 continue;
             }
@@ -258,12 +283,18 @@ pub fn grpc_search(
                 Ok(d) => {
                     if let Some(obj) = one.as_object_mut() {
                         obj.insert("desc".into(), d.get("desc").cloned().unwrap_or(json!("")));
-                        obj.insert("stats".into(), d.get("stats").cloned().unwrap_or(json!(null)));
-                        let cur = obj.get("duration_sec").and_then(|v| v.as_i64()).unwrap_or(0);
-                        if cur == 0 {
-                            if let Some(dv) = d.get("duration_sec") {
-                                obj.insert("duration_sec".into(), dv.clone());
-                            }
+                        obj.insert(
+                            "stats".into(),
+                            d.get("stats").cloned().unwrap_or(json!(null)),
+                        );
+                        let cur = obj
+                            .get("duration_sec")
+                            .and_then(|v| v.as_i64())
+                            .unwrap_or(0);
+                        if cur == 0
+                            && let Some(dv) = d.get("duration_sec")
+                        {
+                            obj.insert("duration_sec".into(), dv.clone());
                         }
                     }
                 }

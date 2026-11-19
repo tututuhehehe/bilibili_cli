@@ -1,7 +1,7 @@
 //! 登录态与清晰度常量：`load_creds`（bilibili_cli.py:250）、QN 表（:59）、
 //! TV_KEY/TV_SEC（:55）。
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use super::err::Failure;
 
@@ -25,10 +25,11 @@ pub fn load_creds() -> Value {
             .get("cookie")
             .and_then(|x| x.as_str())
             .is_some_and(|s| !s.is_empty());
-        if !env.is_empty() && !has_cookie {
-            if let Some(obj) = c.as_object_mut() {
-                obj.insert("cookie".into(), json!(format!("SESSDATA={env}")));
-            }
+        if !env.is_empty()
+            && !has_cookie
+            && let Some(obj) = c.as_object_mut()
+        {
+            obj.insert("cookie".into(), json!(format!("SESSDATA={env}")));
         }
     }
     c

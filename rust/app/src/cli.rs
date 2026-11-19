@@ -21,11 +21,13 @@ pub fn command() -> Command {
         .disable_version_flag(true)
         .disable_help_subcommand(true)
         .args_conflicts_with_subcommands(true)
+        .infer_long_args(true)
         .arg(rest())
         .subcommand(Command::new("help").disable_help_flag(true).arg(rest()))
         .subcommand(
             Command::new("search")
                 .disable_help_flag(true)
+                .infer_long_args(true)
                 .arg(
                     Arg::new("keyword")
                         .required(true)
@@ -37,6 +39,7 @@ pub fn command() -> Command {
                         .short('n')
                         .long("limit")
                         .default_value("20")
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(i64)),
                 )
                 .arg(
@@ -52,6 +55,7 @@ pub fn command() -> Command {
         .subcommand(
             Command::new("list")
                 .disable_help_flag(true)
+                .infer_long_args(true)
                 .arg(
                     Arg::new("target")
                         .required(true)
@@ -63,6 +67,7 @@ pub fn command() -> Command {
                         .short('n')
                         .long("limit")
                         .default_value("20")
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(i64)),
                 )
                 .arg(Arg::new("json").long("json").action(ArgAction::SetTrue))
@@ -71,6 +76,7 @@ pub fn command() -> Command {
         .subcommand(
             Command::new("info")
                 .disable_help_flag(true)
+                .infer_long_args(true)
                 .arg(
                     Arg::new("target")
                         .required(true)
@@ -81,16 +87,19 @@ pub fn command() -> Command {
         )
         .subcommand(
             Command::new("doctor")
-                .disable_help_flag(true),
+                .disable_help_flag(true)
+                .infer_long_args(true),
         )
         .subcommand(
             Command::new("login")
                 .disable_help_flag(true)
+                .infer_long_args(true)
                 .arg(Arg::new("tv").long("tv").action(ArgAction::SetTrue)),
         )
         .subcommand(
             Command::new("dl")
                 .disable_help_flag(true)
+                .infer_long_args(true)
                 .arg(
                     Arg::new("target")
                         .required(true)
@@ -102,6 +111,7 @@ pub fn command() -> Command {
                     Arg::new("quality")
                         .long("quality")
                         .num_args(1)
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(OsString)),
                 )
                 .arg(
@@ -114,6 +124,7 @@ pub fn command() -> Command {
                     Arg::new("parallel")
                         .long("parallel")
                         .default_value("4")
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(i64)),
                 )
                 .arg(
@@ -121,6 +132,7 @@ pub fn command() -> Command {
                         .short('o')
                         .long("out")
                         .num_args(1)
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(OsString)),
                 )
                 .arg(Arg::new("subs").long("subs").action(ArgAction::SetTrue))

@@ -65,7 +65,7 @@ pub fn label(category: &str) -> &str {
         "server" => "服务端",
         "missing" => "缺少依赖",
         "unknown" => "未知",
-        other => return other,
+        other => other,
     }
 }
 
@@ -141,7 +141,10 @@ pub fn biz_code(code: i64) -> Option<(&'static str, &'static str)> {
         -352 => ("blocked", "风控校验失败"),
         -412 => ("blocked", "请求被风控拦截"),
         -403 => ("auth", "访问权限不足：签名无效，或 appkey/appsec 已失效"),
-        -404 => ("interface", "资源不存在：ID 错误、接口路径变更，或 appkey 无效"),
+        -404 => (
+            "interface",
+            "资源不存在：ID 错误、接口路径变更，或 appkey 无效",
+        ),
         -400 => ("interface", "请求参数不被接受：接口参数可能已改版"),
         -10403 => ("rights", "地区或权限限制：需要对应权益"),
         -509 => ("rate_limit", "请求过于频繁"),
