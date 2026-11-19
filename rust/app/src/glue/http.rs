@@ -237,3 +237,19 @@ pub fn user_name(uid: &str) -> String {
         Err(_) => String::new(),
     }
 }
+
+/// `_nav_name`（bilibili_cli.py:421）：nav 接口取用户名；CliError → ""（其余错误上抛）。
+pub fn nav_name(cookie: &str) -> Result<String, Failure> {
+    match fetch_json(
+        "https://api.bilibili.com/x/web-interface/nav",
+        &FetchSpec::new().cookie(cookie),
+    ) {
+        Ok(j) => Ok(j
+            .pointer("/data/uname")
+            .and_then(|x| x.as_str())
+            .unwrap_or("")
+            .to_string()),
+        Err(Failure::Cli(_)) => Ok(String::new()),
+        Err(other) => Err(other),
+    }
+}

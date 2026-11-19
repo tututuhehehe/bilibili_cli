@@ -6,7 +6,8 @@
     "search",
     "list",
     "info",
-    "dl"
+    "dl",
+    "doctor"
   ],
   "units": [
     {
@@ -14,7 +15,8 @@
       "crate": "proto-rs",
       "path": "../proto",
       "commands": [
-        "search"
+        "search",
+        "doctor"
       ],
       "switch": "RUST_ANYTHING_UNIT_PROTO"
     },
@@ -32,6 +34,7 @@
       "crate": "play-rs",
       "path": "../play",
       "commands": [
+        "info",
         "dl"
       ],
       "switch": "RUST_ANYTHING_UNIT_PLAY"

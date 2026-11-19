@@ -279,7 +279,7 @@ fn cmd_info(target: &str, as_json: bool) -> Result<u32, Failure> {
 
 // ------------------------------------------------------------------ dl
 
-use crate::glue::err::{report, CliError};
+use crate::glue::err::{CliError, report};
 
 fn default_out_dir() -> String {
     let home = std::env::var("HOME").unwrap_or_default();
@@ -317,14 +317,20 @@ fn cmd_dl(
         Err(msg) => return Err(Failure::Die(msg)),
     };
     if s_of(&t, "type") != "video" {
-        return Err(Failure::Die("dl 需要视频链接或 BV 号（列投稿请用 list）".into()));
+        return Err(Failure::Die(
+            "dl 需要视频链接或 BV 号（列投稿请用 list）".into(),
+        ));
     }
     let bvid = s_of(&t, "bvid");
     let d = view(&bvid)?;
     let aid = i64_of(&d, "aid");
     let cid = i64_of(&d, "cid");
     let title_raw = d.get("title").and_then(|x| x.as_str()).unwrap_or("");
-    let title = if title_raw.is_empty() { bvid.clone() } else { title_raw.to_string() };
+    let title = if title_raw.is_empty() {
+        bvid.clone()
+    } else {
+        title_raw.to_string()
+    };
     let mut pub_ = i64_of(&d, "pubdate");
     if pub_ == 0 {
         pub_ = now_ts();
@@ -336,8 +342,7 @@ fn cmd_dl(
         .filter(|s| !s.is_empty())
         .unwrap_or("unknown")
         .to_string();
-    let want_qn = parse_port::_qn_value(quality.map(|s| s.to_string()))
-        .map_err(Failure::Raw)?;
+    let want_qn = parse_port::_qn_value(quality.map(|s| s.to_string())).map_err(Failure::Raw)?;
     let creds = load_creds();
 
     let ent0 = play_port::entitlement_of(d.clone()).map_err(Failure::Raw)?;
@@ -356,7 +361,10 @@ fn cmd_dl(
         }
     }
     let Some(data) = data else {
-        eprintln!("\n🏷 内容类型：{}", ent0.get("label").and_then(|x| x.as_str()).unwrap_or(""));
+        eprintln!(
+            "\n🏷 内容类型：{}",
+            ent0.get("label").and_then(|x| x.as_str()).unwrap_or("")
+        );
         eprintln!("TV 与 APP 两个通道都失败：");
         for (_, e) in &failures {
             report(e);
@@ -366,19 +374,22 @@ fn cmd_dl(
     };
 
     let dash = data.get("dash").cloned().unwrap_or_else(|| json!({}));
-    let dash_empty = !dash
-        .as_object()
-        .is_some_and(|o| !o.is_empty());
+    let dash_empty = !dash.as_object().is_some_and(|o| !o.is_empty());
     if dash_empty {
         return Err(CliError::new(
             "rights",
             format!("[{used}] playurl 未返回 dash 流：可能是版权/权益限制"),
         )
-        .channel(if used == "app" { "app" } else if used == "tv" { "tv" } else { "" })
+        .channel(if used == "app" {
+            "app"
+        } else if used == "tv" {
+            "tv"
+        } else {
+            ""
+        })
         .into());
     }
-    let picked = play_port::pick_streams(dash, want_qn, codec.to_string())
-        .map_err(port_cli_err)?;
+    let picked = play_port::pick_streams(dash, want_qn, codec.to_string()).map_err(port_cli_err)?;
     let (video, audio) = match picked.get("$tuple").and_then(|x| x.as_array()) {
         Some(arr) if arr.len() == 2 => (arr[0].clone(), arr[1].clone()),
         _ => return Err(Failure::Raw("pick_streams 返回了非 $tuple 标记".into())),
@@ -387,7 +398,11 @@ fn cmd_dl(
     let qn_id = video.get("id").and_then(|x| x.as_i64()).unwrap_or(0);
     let qn_text = qn_label(qn_id);
     let mut ent = play_port::entitlement_of(d.clone()).map_err(Failure::Raw)?;
-    let state = if qn_id >= 64 || quality.is_some() { "yes" } else { "limited" };
+    let state = if qn_id >= 64 || quality.is_some() {
+        "yes"
+    } else {
+        "limited"
+    };
     let mut my_access = Map::new();
     my_access.insert("state".into(), json!(state));
     my_access.insert("text".into(), json!(access_text(state)));
@@ -405,11 +420,16 @@ fn cmd_dl(
         eprintln!(
             "  🏷 {} · {}",
             ent.get("label").and_then(|x| x.as_str()).unwrap_or(""),
-            ent.get("my_access").and_then(|m| m.get("text")).and_then(|x| x.as_str()).unwrap_or("")
+            ent.get("my_access")
+                .and_then(|m| m.get("text"))
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
         );
     }
 
-    let out_root = out_dir.map(|s| s.to_string()).unwrap_or_else(default_out_dir);
+    let out_root = out_dir
+        .map(|s| s.to_string())
+        .unwrap_or_else(default_out_dir);
     let owner_dir = parse_port::safe_name(owner_name.clone(), 80).map_err(Failure::Raw)?;
     let base = std::path::Path::new(&out_root).join(&owner_dir);
     std::fs::create_dir_all(&base).map_err(|e| Failure::Raw(format!("{e}")))?;
@@ -424,17 +444,26 @@ fn cmd_dl(
     let out;
     if audio_only {
         if audio.as_object().is_none_or(|o| o.is_empty()) {
-            return Err(CliError::new(
-                "rights",
-                format!("[{used}] 没有独立音频轨，无法只下音频"),
-            )
-            .channel(if used == "app" { "app" } else if used == "tv" { "tv" } else { "" })
-            .into());
+            return Err(
+                CliError::new("rights", format!("[{used}] 没有独立音频轨，无法只下音频"))
+                    .channel(if used == "app" {
+                        "app"
+                    } else if used == "tv" {
+                        "tv"
+                    } else {
+                        ""
+                    })
+                    .into(),
+            );
         }
         let kbps = audio.get("bandwidth").and_then(|x| x.as_i64()).unwrap_or(0) / 1000;
         println!("→ [{used}] 音频 · {kbps} kbps");
         out = base.join(format!("{stem}.m4a"));
-        curl_dl(&play_port::_url_of(audio.clone()).map_err(Failure::Raw)?, &out, &referer)?;
+        curl_dl(
+            &play_port::_url_of(audio.clone()).map_err(Failure::Raw)?,
+            &out,
+            &referer,
+        )?;
     } else {
         let vtmp = base.join(format!(".{stem}.video.m4s"));
         out = base.join(format!("{stem}.mp4"));
@@ -444,10 +473,18 @@ fn cmd_dl(
             video.get("height").and_then(|x| x.as_i64()).unwrap_or(0),
             video.get("codecs").and_then(|x| x.as_str()).unwrap_or("")
         );
-        curl_dl(&play_port::_url_of(video.clone()).map_err(Failure::Raw)?, &vtmp, &referer)?;
+        curl_dl(
+            &play_port::_url_of(video.clone()).map_err(Failure::Raw)?,
+            &vtmp,
+            &referer,
+        )?;
         if audio.as_object().is_some_and(|o| !o.is_empty()) {
             let atmp = base.join(format!(".{stem}.audio.m4s"));
-            curl_dl(&play_port::_url_of(audio.clone()).map_err(Failure::Raw)?, &atmp, &referer)?;
+            curl_dl(
+                &play_port::_url_of(audio.clone()).map_err(Failure::Raw)?,
+                &atmp,
+                &referer,
+            )?;
             merge(&vtmp, &atmp, &out)?;
             if !keep_parts {
                 let _ = std::fs::remove_file(&vtmp);
@@ -468,9 +505,15 @@ fn cmd_dl(
     meta.insert("aid".into(), json!(aid));
     meta.insert("cid".into(), json!(cid));
     meta.insert("title".into(), json!(title));
-    meta.insert("url".into(), json!(format!("https://www.bilibili.com/video/{bvid}")));
+    meta.insert(
+        "url".into(),
+        json!(format!("https://www.bilibili.com/video/{bvid}")),
+    );
     let mut author = Map::new();
-    author.insert("uid".into(), owner_obj.get("mid").cloned().unwrap_or(json!(null)));
+    author.insert(
+        "uid".into(),
+        owner_obj.get("mid").cloned().unwrap_or(json!(null)),
+    );
     author.insert("name".into(), json!(owner_name));
     meta.insert("author".into(), Value::Object(author));
     meta.insert("published_at".into(), json!(iso_pub));
@@ -489,7 +532,10 @@ fn cmd_dl(
     meta.insert("channel".into(), json!(used));
     meta.insert("entitlement".into(), ent.clone());
     meta.insert("audio_only".into(), json!(audio_only));
-    meta.insert("desc".into(), json!(desc_raw.chars().take(2000).collect::<String>()));
+    meta.insert(
+        "desc".into(),
+        json!(desc_raw.chars().take(2000).collect::<String>()),
+    );
     meta.insert("file".into(), json!(out_str));
     meta.insert(
         "downloaded_at".into(),
@@ -500,15 +546,24 @@ fn cmd_dl(
         Some((head, _)) => format!("{head}.info.json"),
         None => format!("{out_str}.info.json"),
     };
-    std::fs::write(&side, serde_json::to_string_pretty(&Value::Object(meta.clone())).unwrap_or_default())
-        .map_err(|e| Failure::Raw(format!("{e}")))?;
+    std::fs::write(
+        &side,
+        serde_json::to_string_pretty(&Value::Object(meta.clone())).unwrap_or_default(),
+    )
+    .map_err(|e| Failure::Raw(format!("{e}")))?;
 
     if subs {
         let stem_path = match side.rsplit_once('.') {
             Some((head, _)) => head.to_string(),
             None => side.clone(),
         };
-        save_subs(&bvid, cid, std::path::Path::new(&stem_path), &creds, &referer);
+        save_subs(
+            &bvid,
+            cid,
+            std::path::Path::new(&stem_path),
+            &creds,
+            &referer,
+        );
     }
 
     let size_mb = std::fs::metadata(&out)

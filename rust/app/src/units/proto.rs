@@ -11,7 +11,12 @@ use crate::glue::err::{Failure, SCHEMA, fail_exit};
 use crate::glue::grpc::grpc_search;
 
 pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
-    debug_assert_eq!(command, "search");
+    if command == "doctor" {
+        return match cmd_doctor() {
+            Ok(code) => ExitCode::from(code as u8),
+            Err(f) => fail_exit(f),
+        };
+    }
     let keyword = matches
         .get_one::<OsString>("keyword")
         .map(|s| s.to_string_lossy().into_owned())
@@ -29,6 +34,97 @@ pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
         Ok(code) => ExitCode::from(code as u8),
         Err(f) => fail_exit(f),
     }
+}
+
+fn cmd_doctor() -> Result<u32, Failure> {
+    use crate::glue::creds::load_creds;
+    use crate::glue::download::which;
+    use crate::glue::err::report;
+    use crate::glue::http::{nav_name, user_videos};
+
+    let mut ok = true;
+    println!("环境检查：");
+    for name in ["curl", "ffmpeg", "qrencode", "uv"] {
+        let mark = if which(name).is_some() { "✓" } else { "·" };
+        println!("  {mark} {name}");
+    }
+    let ff = which("ffmpeg").is_some();
+    println!("  {} ffmpeg（合并音视频必需）", if ff { "✓" } else { "✗" });
+    ok = ok && ff;
+
+    let c = load_creds();
+    println!("登录态：");
+    let cookie = c
+        .get("cookie")
+        .and_then(|x| x.as_str())
+        .unwrap_or("")
+        .to_string();
+    if !cookie.is_empty() {
+        let who = nav_name(&cookie)?;
+        let who_disp = if who.is_empty() {
+            String::new()
+        } else {
+            format!("（{who}）")
+        };
+        let saved = c.get("saved_at").and_then(|x| x.as_i64()).unwrap_or(0);
+        let saved_disp = if saved != 0 {
+            parse::port::iso(saved).map_err(Failure::Raw)?[..10].to_string()
+        } else {
+            "未知".to_string()
+        };
+        println!("  ✓ 网页 cookie{who_disp} · 保存于 {saved_disp}");
+    } else {
+        println!("  · 未登录网页（只能拿 480P）");
+    }
+    if c
+        .get("tv_access_token")
+        .and_then(|x| x.as_str())
+        .is_some_and(|t| !t.is_empty())
+    {
+        println!("  ✓ TV access_token（TV 通道可用）");
+    } else {
+        println!("  · 未登录 TV（TV 通道会跳过）");
+    }
+
+    match user_videos("23947287", 3) {
+        Ok(v) => println!(
+            "环境接口：✓ 投稿接口连通（样例 {} 条）",
+            v.get("total").and_then(|x| x.as_i64()).unwrap_or(0)
+        ),
+        Err(Failure::Cli(e)) => {
+            println!("环境接口：✗");
+            report(&e);
+            ok = false;
+        }
+        Err(other) => return Err(other),
+    }
+
+    let t0 = std::time::Instant::now();
+    match grpc_search("露营", 1, "totalrank", false, false) {
+        Ok(hits) => {
+            let dt = t0.elapsed().as_secs_f64();
+            if let Some(first) = hits.first() {
+                let t24: String = first
+                    .get("title")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or("")
+                    .chars()
+                    .take(24)
+                    .collect();
+                println!("搜索接口：✓ gRPC 搜索连通（{dt:.1}s，样例「{t24}」）");
+            } else {
+                println!("搜索接口：✗ gRPC 返回空（接口可能改版）");
+                ok = false;
+            }
+        }
+        Err(Failure::Cli(e)) => {
+            println!("搜索接口：✗");
+            report(&e);
+            ok = false;
+        }
+        Err(other) => return Err(other),
+    }
+    Ok(if ok { 0 } else { 3 })
 }
 
 fn s_of(v: &Value, k: &str) -> String {

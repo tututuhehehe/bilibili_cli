@@ -80,6 +80,10 @@ pub fn command() -> Command {
                 .arg(Arg::new("json").long("json").action(ArgAction::SetTrue)),
         )
         .subcommand(
+            Command::new("doctor")
+                .disable_help_flag(true),
+        )
+        .subcommand(
             Command::new("dl")
                 .disable_help_flag(true)
                 .arg(
