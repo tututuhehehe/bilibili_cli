@@ -33,3 +33,63 @@
 {"fn": "safe_name", "args": ["", 80]}
 {"fn": "safe_name", "args": ["  空白开头结尾  ", 80]}
 {"fn": "safe_name", "args": ["超长标题超过八十个字符的限制边界测试超长标题超过八十个字符的限制边界测试超长标题超过八十个字符的限制边界测试", 80]}
+{"fn": "parse_target", "args": ["BV1ocsd6jErz?from=search"]}
+{"fn": "parse_target", "args": ["https://www.bilibili.com/video/BV1ocsd6jErz?share_source=copy_web"]}
+{"fn": "parse_target", "args": ["BV1OCSD6JERZ"]}
+{"fn": "parse_target", "args": ["BV1ocsd6jerz"]}
+{"fn": "parse_target", "args": ["BV1ocsd6jE BV1abcdefghi"]}
+{"fn": "parse_target", "args": ["BV1ocsd6jErz BV1abcdefghi"]}
+{"fn": "parse_target", "args": ["av170001 BV1ocsd6jErz"]}
+{"fn": "parse_target", "args": ["aid=170001"]}
+{"fn": "parse_target", "args": ["https://www.bilibili.com/video/av170001"]}
+{"fn": "parse_target", "args": ["\"BV1ocsd6jErz\""]}
+{"fn": "parse_target", "args": ["'\"BV1ocsd6jErz\"'"]}
+{"fn": "parse_target", "args": ["  \"23947287\"  "]}
+{"fn": "parse_target", "args": ["２３９４７２８７"]}
+{"fn": "parse_target", "args": ["av１７０１"]}
+{"fn": "parse_target", "args": ["space.bilibili.com/23947287/video"]}
+{"fn": "parse_target", "args": ["https://space.bilibili.com/23947287/favlist?fid=1"]}
+{"fn": "_qn_value", "args": ["  80  "]}
+{"fn": "_qn_value", "args": ["0"]}
+{"fn": "_qn_value", "args": ["1080P60"]}
+{"fn": "_qn_value", "args": ["1080p+"]}
+{"fn": "_qn_value", "args": ["720P60"]}
+{"fn": "_qn_value", "args": ["8K"]}
+{"fn": "_qn_value", "args": ["杜比视界"]}
+{"fn": "_qn_value", "args": ["８０"]}
+{"fn": "_qn_value", "args": ["²"]}
+{"fn": "_qn_value", "args": ["-1"]}
+{"fn": "iso", "args": [2147483647]}
+{"fn": "iso", "args": [253402271999]}
+{"fn": "iso", "args": [253402272000]}
+{"fn": "iso", "args": [253402300800]}
+{"fn": "iso", "args": [-62135596801]}
+{"fn": "fmt_dur", "args": [-0.5]}
+{"fn": "fmt_dur", "args": [59.9]}
+{"fn": "fmt_dur", "args": [3600]}
+{"fn": "fmt_dur", "args": [3599]}
+{"fn": "fmt_dur", "args": [86461]}
+{"fn": "fmt_dur", "args": [-3600]}
+{"fn": "fmt_dur", "args": [-3601]}
+{"fn": "fmt_dur", "args": [{"$num": "NaN"}]}
+{"fn": "fmt_dur", "args": [{"$num": "Infinity"}]}
+{"fn": "_fmt_count", "args": [9999]}
+{"fn": "_fmt_count", "args": [10000]}
+{"fn": "_fmt_count", "args": [99999999]}
+{"fn": "_fmt_count", "args": [100000000]}
+{"fn": "_fmt_count", "args": [12500]}
+{"fn": "_fmt_count", "args": [17500]}
+{"fn": "_fmt_count", "args": [125000000]}
+{"fn": "_fmt_count", "args": [175000000]}
+{"fn": "safe_name", "args": ["全角标点？！：的标题", 80]}
+{"fn": "safe_name", "args": ["标题\n换行\t制表\r回车", 80]}
+{"fn": "safe_name", "args": ["a//b??c**d", 80]}
+{"fn": "safe_name", "args": ["标题　测试", 80]}
+{"fn": "safe_name", "args": ["a b", 80]}
+{"fn": "safe_name", "args": ["　全角空格包裹　", 80]}
+{"fn": "safe_name", "args": ["超长字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字", 80]}
+{"fn": "safe_name", "args": ["标题测试...............................................................................结尾", 80]}
+{"fn": "safe_name", "args": ["abc...", 5]}
+{"fn": "safe_name", "args": ["abc", 0]}
+{"fn": "safe_name", "args": ["abc", -1]}
+{"fn": "safe_name", "args": ["默认limit的标题", {"$undefined": true}]}
