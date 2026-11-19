@@ -4,9 +4,11 @@
 use pyo3::prelude::*;
 
 pub mod js;
+pub mod pb;
 pub mod port;
 pub mod pyconv;
 pub mod pynum;
+pub mod pytext;
 
 #[allow(unused_imports)]
 use pynum::Num;
