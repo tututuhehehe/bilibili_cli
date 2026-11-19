@@ -7,10 +7,10 @@
 
 | 模块 | crate | 状态 | 备注 |
 |---|---|---|---|
-| proto | rust/proto | claimed 2026-11-19 | 13 函数；真实帧 fixtures；`_pi` 负数=原版死循环（允许 Err+注明） |
-| parse | rust/parse | claimed 2026-11-19 | 6 函数；parse_target 失败路径由 app 层用例覆盖 |
-| play  | rust/play  | claimed 2026-11-19 | 5 函数；真实 playurl/view fixtures；CliError 错误用例已录 |
-| sign  | rust/sign  | claimed 2026-11-19 | 3 函数；sign_app 走固定时钟基准 |
+| proto | rust/proto | **done** 2026-11-19（gate ✓ · diff 80/80） | 13 函数；真实帧 cargo 测试过；`_pi` 负数 = 原版死循环 → port 返回 Err（已列已知差异） |
+| parse | rust/parse | **done** 2026-11-19（gate ✓ · diff 95/95） | 6 函数；parse_target 失败路径由 app 层用例覆盖 |
+| play  | rust/play  | **done** 2026-11-19（gate ✓ · diff 41/41） | 5 函数；CliError 异常类用 create_exception! 对齐类型名 |
+| sign  | rust/sign  | **done** 2026-11-19（gate ✓ · diff 10/10） | 3 函数；手写 MD5（含已知向量测试）消除 md-5 外部依赖；sign_app 走固定 ts 基准 |
 
 状态流：`open` → `claimed by <会话> <日期>` → `done`（回填 gate/diff 结果）。
 
