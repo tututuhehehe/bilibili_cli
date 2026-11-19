@@ -3,6 +3,7 @@
 
 use pyo3::prelude::*;
 
+pub mod cli_error;
 pub mod js;
 pub mod port;
 pub mod pyconv;
@@ -28,6 +29,9 @@ fn error(message: String) -> PyErr {
         "ArithmeticError" => e::PyArithmeticError::new_err(text),
         "UnicodeError" => e::PyUnicodeError::new_err(text),
         "ValueError" => e::PyValueError::new_err(text),
+        // bcli 自定义异常：pick_streams 无视频流时原版抛 CliError("rights", ...)；
+        // diff/gate 对比异常类型名，故还原成同名异常类（见 src/cli_error.rs）。
+        "CliError" => crate::cli_error::CliError::new_err(text),
         _ => e::PyValueError::new_err(message),
     }
 }
