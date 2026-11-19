@@ -1,0 +1,66 @@
+{
+  "note": "sign_app 固定时钟基准：原函数内部读 time.time() 无法录制，port 实现须拆出固定 ts 的内部函数，对下列条目逐字节一致",
+  "app_key": "1d8b6e7d45233436",
+  "app_sec": "560c52ccd288fed045859ed18bffd973",
+  "fixed_ts": 1700000000,
+  "cases": [
+    {
+      "params": {},
+      "ts": 1700000000,
+      "q": "appkey=1d8b6e7d45233436&ts=1700000000",
+      "md5": "fba7fec219a0d3002d1e76b650865a85",
+      "urlencoded": "appkey=1d8b6e7d45233436&ts=1700000000&sign=fba7fec219a0d3002d1e76b650865a85"
+    },
+    {
+      "params": {
+        "keyword": "露营",
+        "page": 1
+      },
+      "ts": 1700000000,
+      "q": "appkey=1d8b6e7d45233436&keyword=露营&page=1&ts=1700000000",
+      "md5": "7e6b497f264285e17e4d97a3b4de0308",
+      "urlencoded": "keyword=%E9%9C%B2%E8%90%A5&page=1&appkey=1d8b6e7d45233436&ts=1700000000&sign=7e6b497f264285e17e4d97a3b4de0308"
+    },
+    {
+      "params": {
+        "access_key": "ak",
+        "tid": 0
+      },
+      "ts": 1700000000,
+      "q": "access_key=ak&appkey=1d8b6e7d45233436&tid=0&ts=1700000000",
+      "md5": "0d58c2a1f9263cfbd4036ac3b9ee03e4",
+      "urlencoded": "access_key=ak&tid=0&appkey=1d8b6e7d45233436&ts=1700000000&sign=0d58c2a1f9263cfbd4036ac3b9ee03e4"
+    },
+    {
+      "params": {
+        "mid": "23947287",
+        "ps": 5,
+        "pn": 1,
+        "order": "pubdate"
+      },
+      "ts": 1700000000,
+      "q": "appkey=1d8b6e7d45233436&mid=23947287&order=pubdate&pn=1&ps=5&ts=1700000000",
+      "md5": "c3b5bc43e3538c57814dda31c3492e9e",
+      "urlencoded": "mid=23947287&ps=5&pn=1&order=pubdate&appkey=1d8b6e7d45233436&ts=1700000000&sign=c3b5bc43e3538c57814dda31c3492e9e"
+    },
+    {
+      "params": {
+        "k": "中文🦀值"
+      },
+      "ts": 1700000000,
+      "q": "appkey=1d8b6e7d45233436&k=中文🦀值&ts=1700000000",
+      "md5": "02165469c46f5b8ec2dbda579484d49f",
+      "urlencoded": "k=%E4%B8%AD%E6%96%87%F0%9F%A6%80%E5%80%BC&appkey=1d8b6e7d45233436&ts=1700000000&sign=02165469c46f5b8ec2dbda579484d49f"
+    },
+    {
+      "params": {
+        "z": 1,
+        "a": "x"
+      },
+      "ts": 1700000000,
+      "q": "a=x&appkey=1d8b6e7d45233436&ts=1700000000&z=1",
+      "md5": "79343f300cada838c44a26013b12ab08",
+      "urlencoded": "z=1&a=x&appkey=1d8b6e7d45233436&ts=1700000000&sign=79343f300cada838c44a26013b12ab08"
+    }
+  ]
+}

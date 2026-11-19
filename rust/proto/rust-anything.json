@@ -1,0 +1,302 @@
+{
+  "schema": "rust-anything/bridge@1",
+  "root": "/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli",
+  "unit": "bilibili_cli.py",
+  "language": "python",
+  "kind": "pyo3",
+  "crate_name": "proto",
+  "exports": [
+    {
+      "name": "_pv",
+      "file": "bilibili_cli.py",
+      "line": 1122,
+      "params": [
+        {
+          "name": "n",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "bytes",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_ps",
+      "file": "bilibili_cli.py",
+      "line": 1134,
+      "params": [
+        {
+          "name": "num",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "v",
+          "ts_type": "string",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "bytes",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_pi",
+      "file": "bilibili_cli.py",
+      "line": 1140,
+      "params": [
+        {
+          "name": "num",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "n",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "bytes",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_pm",
+      "file": "bilibili_cli.py",
+      "line": 1145,
+      "params": [
+        {
+          "name": "num",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "body",
+          "ts_type": "bytes",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "bytes",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_pread",
+      "file": "bilibili_cli.py",
+      "line": 1150,
+      "params": [
+        {
+          "name": "buf",
+          "ts_type": "bytes",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "dict",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_ptext",
+      "file": "bilibili_cli.py",
+      "line": 1190,
+      "params": [
+        {
+          "name": "fields",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "num",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "default",
+          "ts_type": "string",
+          "optional": true,
+          "rest": false,
+          "default": "\"\""
+        }
+      ],
+      "returns": "string",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_pint",
+      "file": "bilibili_cli.py",
+      "line": 1198,
+      "params": [
+        {
+          "name": "fields",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "num",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "default",
+          "ts_type": "int",
+          "optional": true,
+          "rest": false,
+          "default": "0"
+        }
+      ],
+      "returns": "int",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_pmsg",
+      "file": "bilibili_cli.py",
+      "line": 1206,
+      "params": [
+        {
+          "name": "fields",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "num",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "dict",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_prep",
+      "file": "bilibili_cli.py",
+      "line": 1213,
+      "params": [
+        {
+          "name": "fields",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "num",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "list",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_strip_em",
+      "file": "bilibili_cli.py",
+      "line": 1265,
+      "params": [
+        {
+          "name": "t",
+          "ts_type": "string",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "string",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_dur_seconds",
+      "file": "bilibili_cli.py",
+      "line": 1269,
+      "params": [
+        {
+          "name": "text",
+          "ts_type": "string",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "int",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_video_from_item",
+      "file": "bilibili_cli.py",
+      "line": 1280,
+      "params": [
+        {
+          "name": "item",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "dict | undefined",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_user_from_item",
+      "file": "bilibili_cli.py",
+      "line": 1310,
+      "params": [
+        {
+          "name": "item",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "dict | undefined",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    }
+  ],
+  "classes": [],
+  "js_only": []
+}

@@ -1,0 +1,6 @@
+{"fn": "cookie_header", "args": [{"cookie": "SESSDATA=abc; buvid3=xyz"}]}
+{"fn": "cookie_header", "args": [{}]}
+{"fn": "cookie_header", "args": [{"cookie": ""}]}
+{"fn": "cookie_header", "args": [{"other": 1}]}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/jar1.txt"]}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/不存在的文件.txt"]}

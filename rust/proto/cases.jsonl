@@ -1,0 +1,34 @@
+{"fn": "_pv", "args": [0], "ok": {"$bytes": [0]}}
+{"fn": "_pv", "args": [1], "ok": {"$bytes": [1]}}
+{"fn": "_pv", "args": [127], "ok": {"$bytes": [127]}}
+{"fn": "_pv", "args": [128], "ok": {"$bytes": [128, 1]}}
+{"fn": "_pv", "args": [300], "ok": {"$bytes": [172, 2]}}
+{"fn": "_pv", "args": [9223372036854775807], "ok": {"$bytes": [255, 255, 255, 255, 255, 255, 255, 255, 127]}}
+{"fn": "_ps", "args": [1, "a"], "ok": {"$bytes": [10, 1, 97]}}
+{"fn": "_ps", "args": [2, "你好🦀"], "ok": {"$bytes": [18, 10, 228, 189, 160, 229, 165, 189, 240, 159, 166, 128]}}
+{"fn": "_ps", "args": [536870911, "x"], "ok": {"$bytes": [250, 255, 255, 255, 15, 1, 120]}}
+{"fn": "_ps", "args": [3, ""], "ok": {"$bytes": [26, 0]}}
+{"fn": "_pi", "args": [1, 0], "ok": {"$bytes": [8, 0]}}
+{"fn": "_pi", "args": [4, 2147483648], "ok": {"$bytes": [32, 128, 128, 128, 128, 8]}}
+{"fn": "_pi", "args": [5, 4611686018427387904], "ok": {"$bytes": [40, 128, 128, 128, 128, 128, 128, 128, 128, 64]}}
+{"fn": "_pm", "args": [1, {"$bytes": [8, 1]}], "ok": {"$bytes": [10, 2, 8, 1]}}
+{"fn": "_pm", "args": [2, {"$bytes": []}], "ok": {"$bytes": [18, 0]}}
+{"fn": "_pread", "args": [{"$bytes": [8, 1, 18, 3, 97, 98, 99]}], "ok": {"$dict": [[1, [{"$tuple": [0, 1]}]], [2, [{"$tuple": [2, {"$bytes": [97, 98, 99]}]}]]]}}
+{"fn": "_pread", "args": [{"$bytes": [16, 234, 143, 218, 5]}], "ok": {"$dict": [[2, [{"$tuple": [0, 11962346]}]]]}}
+{"fn": "_pread", "args": [{"$bytes": [26, 2, 8, 42]}], "ok": {"$dict": [[3, [{"$tuple": [2, {"$bytes": [8, 42]}]}]]]}}
+{"fn": "_pread", "args": [{"$bytes": []}], "ok": {}}
+{"fn": "_pread", "args": [{"$bytes": [8]}], "error": "IndexError: index out of range"}
+{"fn": "_ptext", "args": [{"$dict": [[2, [{"$tuple": [2, {"$bytes": [97, 98, 99]}]}]]]}, 2, ""], "ok": "abc"}
+{"fn": "_ptext", "args": [{"$dict": []}, 7, "missing"], "ok": "missing"}
+{"fn": "_pint", "args": [{"$dict": [[1, [{"$tuple": [0, 42]}]]]}, 1, 0], "ok": 42}
+{"fn": "_pint", "args": [{"$dict": []}, 9, -1], "ok": -1}
+{"fn": "_pmsg", "args": [{"$dict": [[3, [{"$tuple": [2, {"$bytes": [8, 1]}]}]]]}, 3], "ok": {"$dict": [[1, [{"$tuple": [0, 1]}]]]}}
+{"fn": "_prep", "args": [{"$dict": [[4, [{"$tuple": [2, {"$bytes": [8, 1]}]}, {"$tuple": [2, {"$bytes": [16, 2]}]}]]]}, 4], "ok": [{"$bytes": [8, 1]}, {"$bytes": [16, 2]}]}
+{"fn": "_strip_em", "args": ["【荒野求生】-21℃暴风雪，倒树下搭庇护所独自撑过三天"], "ok": "【荒野求生】-21℃暴风雪，倒树下搭庇护所独自撑过三天"}
+{"fn": "_strip_em", "args": ["标题<em class=\"keyword\">露营</em>装备指南"], "ok": "标题露营装备指南"}
+{"fn": "_strip_em", "args": ["emoji🦀与中文"], "ok": "emoji🦀与中文"}
+{"fn": "_dur_seconds", "args": ["68:44"], "ok": 4124}
+{"fn": "_dur_seconds", "args": ["25:7"], "ok": 1507}
+{"fn": "_dur_seconds", "args": ["1:2:3"], "ok": 3723}
+{"fn": "_dur_seconds", "args": [""], "ok": 0}
+{"fn": "_dur_seconds", "args": ["垃圾"], "ok": 0}

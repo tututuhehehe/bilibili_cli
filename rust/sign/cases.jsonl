@@ -1,0 +1,6 @@
+{"fn": "cookie_header", "args": [{"cookie": "SESSDATA=abc; buvid3=xyz"}], "ok": "SESSDATA=abc; buvid3=xyz"}
+{"fn": "cookie_header", "args": [{}], "ok": ""}
+{"fn": "cookie_header", "args": [{"cookie": ""}], "ok": ""}
+{"fn": "cookie_header", "args": [{"other": 1}], "ok": ""}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/jar1.txt"], "ok": {"SESSDATA": "synthetic_secret_1", "buvid3": "synthetic_buvid", "bili_jct": "synthetic_jct"}}
+{"fn": "_read_jar", "args": ["/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli/rust/sign/fixtures/不存在的文件.txt"], "ok": {}}

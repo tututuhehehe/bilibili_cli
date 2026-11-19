@@ -1,0 +1,122 @@
+{
+  "schema": "rust-anything/bridge@1",
+  "root": "/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli",
+  "unit": "bilibili_cli.py",
+  "language": "python",
+  "kind": "pyo3",
+  "crate_name": "play",
+  "exports": [
+    {
+      "name": "entitlement_of",
+      "file": "bilibili_cli.py",
+      "line": 502,
+      "params": [
+        {
+          "name": "d",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "dict",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "access_of",
+      "file": "bilibili_cli.py",
+      "line": 524,
+      "params": [
+        {
+          "name": "probes",
+          "ts_type": "unknown[]",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "ent",
+          "ts_type": "dict | undefined",
+          "optional": true,
+          "rest": false,
+          "default": "None"
+        }
+      ],
+      "returns": "dict",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "pick_streams",
+      "file": "bilibili_cli.py",
+      "line": 590,
+      "params": [
+        {
+          "name": "dash",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "want_qn",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "codec",
+          "ts_type": "string",
+          "optional": true,
+          "rest": false,
+          "default": "\"avc\""
+        }
+      ],
+      "returns": "tuple",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_url_of",
+      "file": "bilibili_cli.py",
+      "line": 605,
+      "params": [
+        {
+          "name": "s",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "string",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_backup_of",
+      "file": "bilibili_cli.py",
+      "line": 609,
+      "params": [
+        {
+          "name": "s",
+          "ts_type": "dict",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "list",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    }
+  ],
+  "classes": [],
+  "js_only": []
+}

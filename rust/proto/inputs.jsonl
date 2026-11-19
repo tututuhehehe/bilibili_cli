@@ -1,0 +1,35 @@
+{"fn": "_pv", "args": [0]}
+{"fn": "_pv", "args": [1]}
+{"fn": "_pv", "args": [127]}
+{"fn": "_pv", "args": [128]}
+{"fn": "_pv", "args": [300]}
+{"fn": "_pv", "args": [9223372036854775807]}
+{"fn": "_ps", "args": [1, "a"]}
+{"fn": "_ps", "args": [2, "你好🦀"]}
+{"fn": "_ps", "args": [536870911, "x"]}
+{"fn": "_ps", "args": [3, ""]}
+{"fn": "_pi", "args": [1, 0]}
+{"fn": "_pi", "args": [2, -1]}
+{"fn": "_pi", "args": [4, 2147483648]}
+{"fn": "_pi", "args": [5, 4611686018427387904]}
+{"fn": "_pm", "args": [1, {"$bytes": [8, 1]}]}
+{"fn": "_pm", "args": [2, {"$bytes": []}]}
+{"fn": "_pread", "args": [{"$bytes": [8, 1, 18, 3, 97, 98, 99]}]}
+{"fn": "_pread", "args": [{"$bytes": [16, 234, 143, 218, 5]}]}
+{"fn": "_pread", "args": [{"$bytes": [26, 2, 8, 42]}]}
+{"fn": "_pread", "args": [{"$bytes": []}]}
+{"fn": "_pread", "args": [{"$bytes": [8]}]}
+{"fn": "_ptext", "args": [{"$dict": [[2, [{"$tuple": [2, {"$bytes": [97, 98, 99]}]}]]]}, 2, ""]}
+{"fn": "_ptext", "args": [{"$dict": []}, 7, "missing"]}
+{"fn": "_pint", "args": [{"$dict": [[1, [{"$tuple": [0, 42]}]]]}, 1, 0]}
+{"fn": "_pint", "args": [{"$dict": []}, 9, -1]}
+{"fn": "_pmsg", "args": [{"$dict": [[3, [{"$tuple": [2, {"$bytes": [8, 1]}]}]]]}, 3]}
+{"fn": "_prep", "args": [{"$dict": [[4, [{"$tuple": [2, {"$bytes": [8, 1]}]}, {"$tuple": [2, {"$bytes": [16, 2]}]}]]]}, 4]}
+{"fn": "_strip_em", "args": ["【荒野求生】-21℃暴风雪，倒树下搭庇护所独自撑过三天"]}
+{"fn": "_strip_em", "args": ["标题<em class=\"keyword\">露营</em>装备指南"]}
+{"fn": "_strip_em", "args": ["emoji🦀与中文"]}
+{"fn": "_dur_seconds", "args": ["68:44"]}
+{"fn": "_dur_seconds", "args": ["25:7"]}
+{"fn": "_dur_seconds", "args": ["1:2:3"]}
+{"fn": "_dur_seconds", "args": [""]}
+{"fn": "_dur_seconds", "args": ["垃圾"]}

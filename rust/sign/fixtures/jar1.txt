@@ -1,0 +1,6 @@
+# Netscape HTTP Cookie File
+# https://curl.se/docs/http-cookies.html
+
+#HttpOnly_.bilibili.com	TRUE	/	TRUE	0	SESSDATA	synthetic_secret_1
+.bilibili.com	TRUE	/	FALSE	1735689600	buvid3	synthetic_buvid
+.api.bilibili.com	TRUE	/	TRUE	0	bili_jct	synthetic_jct

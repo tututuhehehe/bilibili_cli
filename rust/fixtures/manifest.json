@@ -1,0 +1,16 @@
+{
+  "note": "匿名 gRPC 抓帧：SearchAll(露营,1条) 与 View(其首条视频)。无凭据。",
+  "bvid": "BV1K7tgzfEr4",
+  "frames": [
+    {
+      "path": "/bilibili.polymer.app.search.v1.Search/SearchAll",
+      "req": 14,
+      "resp": 71396
+    },
+    {
+      "path": "/bilibili.app.view.v1.View/View",
+      "req": 14,
+      "resp": 21460
+    }
+  ]
+}

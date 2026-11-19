@@ -1,0 +1,35 @@
+{"fn": "parse_target", "args": ["BV1ocsd6jErz"]}
+{"fn": "parse_target", "args": ["https://www.bilibili.com/video/BV1ocsd6jErz?p=1"]}
+{"fn": "parse_target", "args": ["23947287"]}
+{"fn": "parse_target", "args": ["https://space.bilibili.com/23947287?spm_id_from=333.999.0.0"]}
+{"fn": "parse_target", "args": ["av170001"]}
+{"fn": "parse_target", "args": ["'BV1ocsd6jErz'"]}
+{"fn": "_qn_value", "args": ["1080P"]}
+{"fn": "_qn_value", "args": ["1080p"]}
+{"fn": "_qn_value", "args": ["80"]}
+{"fn": "_qn_value", "args": ["4K"]}
+{"fn": "_qn_value", "args": [""]}
+{"fn": "_qn_value", "args": ["垃圾"]}
+{"fn": "_qn_value", "args": [null]}
+{"fn": "iso", "args": [0]}
+{"fn": "iso", "args": [1792419130]}
+{"fn": "iso", "args": [951782400]}
+{"fn": "iso", "args": [-1]}
+{"fn": "iso", "args": [4102444800]}
+{"fn": "fmt_dur", "args": [0]}
+{"fn": "fmt_dur", "args": [61]}
+{"fn": "fmt_dur", "args": [3661]}
+{"fn": "fmt_dur", "args": [4124.5]}
+{"fn": "fmt_dur", "args": [-5]}
+{"fn": "_fmt_count", "args": [0]}
+{"fn": "_fmt_count", "args": [999]}
+{"fn": "_fmt_count", "args": [1000]}
+{"fn": "_fmt_count", "args": [12345]}
+{"fn": "_fmt_count", "args": [123456789]}
+{"fn": "_fmt_count", "args": [-1]}
+{"fn": "safe_name", "args": ["正常标题", 80]}
+{"fn": "safe_name", "args": ["a/b:c*d?\"e<f>g|h", 80]}
+{"fn": "safe_name", "args": ["🦀emoji和中文混合的标题", 80]}
+{"fn": "safe_name", "args": ["", 80]}
+{"fn": "safe_name", "args": ["  空白开头结尾  ", 80]}
+{"fn": "safe_name", "args": ["超长标题超过八十个字符的限制边界测试超长标题超过八十个字符的限制边界测试超长标题超过八十个字符的限制边界测试", 80]}

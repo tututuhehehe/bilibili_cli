@@ -1,0 +1,128 @@
+{
+  "schema": "rust-anything/bridge@1",
+  "root": "/Users/limoon/Documents/moon_cli_or_tool/bilibili_cli",
+  "unit": "bilibili_cli.py",
+  "language": "python",
+  "kind": "pyo3",
+  "crate_name": "parse",
+  "exports": [
+    {
+      "name": "parse_target",
+      "file": "bilibili_cli.py",
+      "line": 431,
+      "params": [
+        {
+          "name": "t",
+          "ts_type": "string",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "dict",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "iso",
+      "file": "bilibili_cli.py",
+      "line": 488,
+      "params": [
+        {
+          "name": "ts",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "string",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "fmt_dur",
+      "file": "bilibili_cli.py",
+      "line": 492,
+      "params": [
+        {
+          "name": "sec",
+          "ts_type": "number",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "string",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "safe_name",
+      "file": "bilibili_cli.py",
+      "line": 651,
+      "params": [
+        {
+          "name": "s",
+          "ts_type": "string",
+          "optional": false,
+          "rest": false
+        },
+        {
+          "name": "limit",
+          "ts_type": "int",
+          "optional": true,
+          "rest": false,
+          "default": "80"
+        }
+      ],
+      "returns": "string",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_qn_value",
+      "file": "bilibili_cli.py",
+      "line": 553,
+      "params": [
+        {
+          "name": "name",
+          "ts_type": "string | undefined",
+          "optional": true,
+          "rest": false,
+          "default": "None"
+        }
+      ],
+      "returns": "int",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    },
+    {
+      "name": "_fmt_count",
+      "file": "bilibili_cli.py",
+      "line": 1400,
+      "params": [
+        {
+          "name": "n",
+          "ts_type": "int",
+          "optional": false,
+          "rest": false
+        }
+      ],
+      "returns": "string",
+      "is_async": false,
+      "is_generator": false,
+      "type_params": [],
+      "uses_instanceof": false
+    }
+  ],
+  "classes": [],
+  "js_only": []
+}
