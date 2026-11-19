@@ -20,6 +20,7 @@ pub struct CurlSpec<'a> {
     pub resume: bool,
     pub quiet: bool,
     pub jar: &'a str,
+    pub range: Option<(u64, u64)>,
 }
 
 impl<'a> CurlSpec<'a> {
@@ -35,6 +36,7 @@ impl<'a> CurlSpec<'a> {
             resume: false,
             quiet: false,
             jar: "",
+            range: None,
         }
     }
     pub fn ua(mut self, ua: &'a str) -> Self {
@@ -63,6 +65,10 @@ impl<'a> CurlSpec<'a> {
     }
     pub fn resume(mut self, r: bool) -> Self {
         self.resume = r;
+        self
+    }
+    pub fn range(mut self, s: u64, e: u64) -> Self {
+        self.range = Some((s, e));
         self
     }
 }
@@ -119,6 +125,10 @@ pub fn curl(url: &str, spec: &CurlSpec) -> Result<(String, i64), CliError> {
         if spec.resume {
             cmd.push("-C".into());
             cmd.push("-".into());
+        }
+        if let Some((s, e)) = spec.range {
+            cmd.push("-r".into());
+            cmd.push(format!("{s}-{e}"));
         }
         cmd.push("-w".into());
         cmd.push(if spec.quiet {

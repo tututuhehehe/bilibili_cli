@@ -202,3 +202,189 @@ mod tests {
         assert!(!dest.exists(), "半成品必须删除，绝不留「看起来正常」的文件");
     }
 }
+
+// ------------------------------------------------------------------ 分段并行
+
+use super::curl::UA_WEB;
+
+/// 分段阈值：小于它的流直接单流（ADR-014：32MB）。
+const PARALLEL_THRESHOLD: u64 = 32 * 1024 * 1024;
+/// 并行上限（实测 8 以上收益边际、连接面翻倍，ADR-014）。
+const MAX_PARALLEL: i64 = 8;
+
+/// `Range: bytes=0-0` 探测流总大小；无 Range 支持/失败 → None。
+fn content_total(url: &str, referer: &str) -> Option<u64> {
+    let out = Command::new("curl")
+        .args([
+            "-sS",
+            "--compressed",
+            "--http2",
+            "--max-time",
+            "20",
+            "-A",
+            UA_WEB,
+            "-H",
+            &format!("Referer: {referer}"),
+            "-H",
+            "Accept: application/json, text/plain, */*",
+            "-r",
+            "0-0",
+            "-o",
+            "/dev/null",
+            "-D",
+            "-",
+        ])
+        .arg(url)
+        .output()
+        .ok()?;
+    if !out.status.success() {
+        return None;
+    }
+    let head = String::from_utf8_lossy(&out.stdout);
+    for line in head.lines() {
+        if line.to_ascii_lowercase().starts_with("content-range:") {
+            let total = line.rsplit('/').next()?.trim();
+            return total.parse().ok();
+        }
+    }
+    None
+}
+
+/// 单段下载：3 次整段重试；最终失败删本段半成品。
+fn download_part(
+    url: &str,
+    dest: &Path,
+    referer: &str,
+    start: u64,
+    end: u64,
+) -> Result<(), CliError> {
+    let want = end - start + 1;
+    let mut last = CliError::new("network", "下载失败（未知原因）");
+    for i in 0..3 {
+        let dest_str = dest.to_string_lossy().into_owned();
+        let spec = CurlSpec::new()
+            .referer(Some(referer))
+            .timeout(3600)
+            .save_to(&dest_str)
+            .range(start, end);
+        match curl(url, &spec) {
+            Ok(_) => {
+                let got = std::fs::metadata(dest).map(|m| m.len()).unwrap_or(0);
+                if got == want {
+                    return Ok(());
+                }
+                last = CliError::new("empty", format!("分段大小不符（{got} ≠ {want}）"));
+            }
+            Err(e) => last = e,
+        }
+        let got = std::fs::metadata(dest).map(|m| m.len()).unwrap_or(0);
+        eprintln!(
+            "  · 分段 [{start}-{end}] 中断（第 {}/3 次，已 {} MB）：{} → 整段重下",
+            i + 1,
+            mb(got),
+            last.summary
+        );
+        sleep(Duration::from_secs(1));
+    }
+    let _ = std::fs::remove_file(dest);
+    Err(last)
+}
+
+fn concat_parts(parts: &[PathBuf], dest: &Path, total: u64) -> Result<(), String> {
+    let mut out = std::fs::File::create(dest).map_err(|e| format!("{e}"))?;
+    for p in parts {
+        let mut f = std::fs::File::open(p).map_err(|e| format!("{e}"))?;
+        std::io::copy(&mut f, &mut out).map_err(|e| format!("{e}"))?;
+    }
+    out.flush().map_err(|e| format!("{e}"))?;
+    let got = std::fs::metadata(dest).map(|m| m.len()).unwrap_or(0);
+    if got != total {
+        return Err(format!("拼接大小不符（{got} ≠ {total}）"));
+    }
+    Ok(())
+}
+
+/// 分段并行下载一条流（ADR-014）。
+/// parallel ≤ 1 / 文件小于阈值 / 无 Range 支持 → 单流；
+/// 任一段最终失败或拼接异常 → 删全部半成品 → 回退单流（自带重试与必删语义）。
+pub fn download_track(
+    url: &str,
+    dest: &Path,
+    referer: &str,
+    parallel: i64,
+) -> Result<(), Failure> {
+    if parallel <= 1 {
+        return curl_dl(url, dest, referer);
+    }
+    let Some(total) = content_total(url, referer) else {
+        return curl_dl(url, dest, referer);
+    };
+    if total < PARALLEL_THRESHOLD {
+        return curl_dl(url, dest, referer);
+    }
+    let n = parallel.min(MAX_PARALLEL).max(2) as u64;
+    let parts: Vec<(u64, u64)> = (0..n)
+        .map(|i| (total * i / n, total * (i + 1) / n - 1))
+        .collect();
+    let part_paths: Vec<PathBuf> = (0..n)
+        .map(|i| PathBuf::from(format!("{}.part{i}", dest.to_string_lossy())))
+        .collect();
+
+    let results: Vec<Result<(), CliError>> = std::thread::scope(|scope| {
+        let handles: Vec<_> = parts
+            .iter()
+            .zip(part_paths.iter())
+            .map(|((s, e), pp)| scope.spawn(move || download_part(url, pp, referer, *s, *e)))
+            .collect();
+        handles
+            .into_iter()
+            .map(|h| {
+                h.join()
+                    .unwrap_or_else(|_| Err(CliError::new("unknown", "分段线程崩溃")))
+            })
+            .collect()
+    });
+
+    if results.iter().all(|r| r.is_ok()) {
+        let joined = concat_parts(&part_paths, dest, total);
+        for p in &part_paths {
+            let _ = std::fs::remove_file(p);
+        }
+        if let Err(e) = joined {
+            eprintln!("  · 拼接异常：{e} → 回退单流");
+            let _ = std::fs::remove_file(dest);
+            return curl_dl(url, dest, referer);
+        }
+        return Ok(());
+    }
+    for p in &part_paths {
+        let _ = std::fs::remove_file(p);
+    }
+    eprintln!("  · 分段下载失败 → 回退单流");
+    curl_dl(url, dest, referer)
+}
+
+#[cfg(test)]
+mod parallel_tests {
+    use super::*;
+    /// 403 流：探测失败 → 回退单流 → 失败 → 半成品必删。
+    /// 需联网，手动跑：cargo test -- --ignored
+    #[test]
+    #[ignore = "需联网；手动跑"]
+    fn track_403_falls_back_to_single_and_cleans() {
+        let dest = std::env::temp_dir().join("bcli_dl_track_404.m4s");
+        std::fs::write(&dest, b"stale").unwrap();
+        let r = download_track(
+            "https://i0.hdslb.com/bfs/archive/__definitely_missing_404__.bin",
+            &dest,
+            "https://www.bilibili.com/",
+            4,
+        );
+        assert!(r.is_err(), "403 流必须失败");
+        assert!(!dest.exists(), "回退单流失败后半成品必须删除");
+        assert!(
+            !std::env::temp_dir().join("bcli_dl_track_404.m4s.part0").exists(),
+            "分段半成品必须删除"
+        );
+    }
+}

@@ -34,7 +34,15 @@ search 1 次 / `list --json --rights` 1 次 / info 1 次 / doctor；
 fallback 率 0 + 4 单元 gate 全绿 + 冒烟全过 → `rust/app` 纯化 →
 `bilibili_cli.py` 移 `legacy/`，README 重写。
 
+## lift 前待办
+- help/argparse 模拟层（89 条离线用例由 Rust 原生作答，回落率才能归零）
+- **app-cases 的 dl usage 行 + help-dl 文本加 --parallel**（ADR-014 变更，约 33 个 fixture，
+  必须与模拟层同步改，否则 replay 红）
+- 拆 main.rs 的 original 调用 → app lift → README 重写 → bilibili_cli.py 移 legacy/
+
 ## 已解决的坑（别再踩）
+- **下载流必须用 UA_WEB（浏览器 UA）**：UA_APP（BiliDroid）直连流会被 CDN 403；
+  探针/测速一律带浏览器 UA + Referer（Rust/Python 的 curl() 默认就是 UA_WEB，别学探针翻车）
 - **搜索排序会实时抖动**（totalrank 第 2 条起会变，py 自比也不稳定）：
   验收一律用「配对对比」，勿单次 diff 下结论。
 - record 生成用例喂垃圾输入会触发 `die()`→SystemExit 杀录制进程

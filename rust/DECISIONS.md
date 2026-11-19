@@ -91,3 +91,16 @@ Decision: 本移植的所有 subagent / rex 会话（含后续 wave 的接线与
 （`pi --model opencode-go/glm-5.3:max`），不依赖默认路由。
 Consequences: 协调者（主会话）模型不受此约束；此条同时已写入根 AGENTS.md。
 
+
+## ADR-014 dl 新增 --parallel 分段并行下载
+Status: accepted (2026-11-19)
+Context: 用户反馈长视频下载慢；实测单连接被 CDN 压速（当晚 ~2MB/s），
+4 段 Range 并行 ~19MB/s。探测矩阵：4/6/8 并行收益 1.9-2.2×（管道饱和），
+被压速场景收益按倍数放大（实测同一 176MB 视频 89.3s → 9.6s，9.3×）。
+Decision: `--parallel N`（默认 4，0/1=单流，上限 8）；流 ≥32MB 才分段（音频同规则）；
+Range 0-0 探测大小，无 Range 支持回退单流；任一段 3 次整段重试失败或拼接异常
+→ 删全部半成品 → 回退单流（保留「绝不留坏文件」承诺）。
+分段 md5 与单流逐字节一致（176.7MB 实测同 md5）。
+Consequences: 这是唯一超出 Python 原版的功能（用户批准）；
+**lift 时须同步更新 app-cases 里 dl 的 usage 行与 help-dl 文本**（加 --parallel），
+以及 argparse 模拟层用新 usage 行——已记入 MAP 待办。

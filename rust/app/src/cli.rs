@@ -111,6 +111,12 @@ pub fn command() -> Command {
                         .value_parser(["avc", "hevc", "av1"]),
                 )
                 .arg(
+                    Arg::new("parallel")
+                        .long("parallel")
+                        .default_value("4")
+                        .value_parser(value_parser!(i64)),
+                )
+                .arg(
                     Arg::new("out")
                         .short('o')
                         .long("out")

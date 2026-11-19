@@ -11,7 +11,7 @@ use play::port as play_port;
 use serde_json::{Map, Value, json};
 
 use crate::glue::creds::{access_text, load_creds, qn_label};
-use crate::glue::download::{curl_dl, merge, save_subs};
+use crate::glue::download::{download_track, merge, save_subs};
 use crate::glue::err::{Failure, SCHEMA, fail_exit};
 use crate::glue::http::view;
 use crate::glue::play::playurl;
@@ -35,6 +35,7 @@ pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
                 .get_one::<String>("codec")
                 .cloned()
                 .unwrap_or_else(|| "avc".into());
+            let parallel = *matches.get_one::<i64>("parallel").unwrap_or(&4);
             let out_dir = matches
                 .get_one::<OsString>("out")
                 .map(|s| s.to_string_lossy().into_owned());
@@ -47,6 +48,7 @@ pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
                 matches.get_flag("subs"),
                 matches.get_flag("keep_parts"),
                 as_json,
+                parallel,
             ) {
                 Ok(code) => ExitCode::from(code as u8),
                 Err(f) => fail_exit(f),
@@ -311,6 +313,7 @@ fn cmd_dl(
     subs: bool,
     keep_parts: bool,
     as_json: bool,
+    parallel: i64,
 ) -> Result<u32, Failure> {
     let t = match parse_port::parse_target(target.to_string()) {
         Ok(v) => v,
@@ -459,10 +462,11 @@ fn cmd_dl(
         let kbps = audio.get("bandwidth").and_then(|x| x.as_i64()).unwrap_or(0) / 1000;
         println!("→ [{used}] 音频 · {kbps} kbps");
         out = base.join(format!("{stem}.m4a"));
-        curl_dl(
+        download_track(
             &play_port::_url_of(audio.clone()).map_err(Failure::Raw)?,
             &out,
             &referer,
+            parallel,
         )?;
     } else {
         let vtmp = base.join(format!(".{stem}.video.m4s"));
@@ -473,17 +477,19 @@ fn cmd_dl(
             video.get("height").and_then(|x| x.as_i64()).unwrap_or(0),
             video.get("codecs").and_then(|x| x.as_str()).unwrap_or("")
         );
-        curl_dl(
+        download_track(
             &play_port::_url_of(video.clone()).map_err(Failure::Raw)?,
             &vtmp,
             &referer,
+            parallel,
         )?;
         if audio.as_object().is_some_and(|o| !o.is_empty()) {
             let atmp = base.join(format!(".{stem}.audio.m4s"));
-            curl_dl(
+            download_track(
                 &play_port::_url_of(audio.clone()).map_err(Failure::Raw)?,
                 &atmp,
                 &referer,
+                parallel,
             )?;
             merge(&vtmp, &atmp, &out)?;
             if !keep_parts {
