@@ -1,0 +1,2 @@
+usage: bilibili_cli list [-h] [-n LIMIT] [--json] [--rights] target
+bilibili_cli list: error: argument -n/--limit: invalid int value: 'é'

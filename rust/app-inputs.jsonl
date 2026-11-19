@@ -1,0 +1,22 @@
+{"name": "help", "args": ["help"]}
+{"name": "help-search", "args": ["help", "search"]}
+{"name": "help-list", "args": ["help", "list"]}
+{"name": "help-info", "args": ["help", "info"]}
+{"name": "help-dl", "args": ["help", "dl"]}
+{"name": "help-login", "args": ["help", "login"]}
+{"name": "help-doctor", "args": ["help", "doctor"]}
+{"name": "help-unknown", "args": ["help", "nosuch"]}
+{"name": "no-args", "args": []}
+{"name": "unknown-command", "args": ["frobnicate"]}
+{"name": "flag-help", "args": ["--help"]}
+{"name": "search-missing-keyword", "args": ["search"]}
+{"name": "search-bad-sort", "args": ["search", "x", "--sort", "bogus"]}
+{"name": "list-missing-target", "args": ["list"]}
+{"name": "list-bad-target", "args": ["list", "zzz"]}
+{"name": "list-bad-n", "args": ["list", "x", "-n", "abc"]}
+{"name": "info-missing-target", "args": ["info"]}
+{"name": "info-bad-target", "args": ["info", "zzz"]}
+{"name": "dl-missing-target", "args": ["dl"]}
+{"name": "dl-bad-target", "args": ["dl", "zzz"]}
+{"name": "dl-bad-codec", "args": ["dl", "BV1ocsd6jErz", "--codec", "zzz"]}
+{"name": "login-bad-flag", "args": ["login", "--nope"]}

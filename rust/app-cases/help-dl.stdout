@@ -1,0 +1,17 @@
+bcli dl <BV|链接> [--audio] [--quality Q] [--codec C] [--subs] [--keep-parts] [-o DIR] [--json]
+
+  --audio        只下音频 m4a（做笔记最快，体积约 1/10）
+  --quality      最高清晰度：1080P / 720P / 480P / 4K，默认最高可用
+  --codec        视频编码偏好 avc | hevc | av1（默认 avc，兼容性最好）
+  --subs         同时保存字幕 srt
+  --keep-parts   保留下载的临时分轨（排查用）
+  -o             输出根目录，默认 ~/Documents/bilibili_content
+
+通道：app 首选 → tv 降级 → 都失败则报错（不碰 web 端）
+产物：<DIR>/<UP主>/<YYYY-MM-DD>_<标题>.mp4（或 .m4a）
+      + 同名 .info.json（含 channel、权益快照 my_access）
+断流：自动续传最多 3 次；最终失败会删除半成品，绝不留下“看起来正常”的文件
+
+例：bcli dl BV1Vbnn6iEfG --audio
+    bcli dl BV1Vbnn6iEfG --quality 720P --subs
+    bcli dl BV1Vbnn6iEfG -o /tmp/test

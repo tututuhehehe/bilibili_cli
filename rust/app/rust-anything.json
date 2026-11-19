@@ -1,0 +1,8 @@
+{
+  "schema": "rust-anything/front-door@1",
+  "name": "bilibili_cli",
+  "commands": [
+    "help"
+  ],
+  "units": []
+}

@@ -1,0 +1,5 @@
+usage: bilibili_cli dl [-h] [--audio] [--quality QUALITY]
+                       [--codec {avc,hevc,av1}] [-o OUT] [--subs]
+                       [--keep-parts] [--json]
+                       target
+bilibili_cli dl: error: argument --codec: invalid choice: '' (choose from 'avc', 'hevc', 'av1')

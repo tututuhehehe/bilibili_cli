@@ -1,0 +1,4 @@
+bin.name = "bilibili_cli"
+args = ["dl", "BV1ocsd6jErz", "--codec", "straße"]
+status.code = 2
+fs.sandbox = true

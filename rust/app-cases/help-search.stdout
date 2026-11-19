@@ -1,0 +1,20 @@
+bcli search <关键词> [-n 20] [--sort X] [--users] [--desc] [--json]
+
+  -n        条数，默认 20，上限 100（gRPC 每页 20，自动翻页）
+  --sort    totalrank 综合(默认) | play 最多播放 | new 最新 | dm 最多弹幕 | stow 最多收藏
+  --users   搜 UP 主（返回 mid / 粉丝 / 投稿 / 等级 / 认证 / 签名）
+  --desc    补每条简介 + 收藏/点赞/投币（每条多一次请求，约 +130ms）
+  --json    schema: bilibili_cli.v1，type=search
+
+通道：B 站 App 的 gRPC 接口（bilibili.polymer.app.search.v1），
+      不需要登录、不需要 cookie、不碰浏览器，实测连打不触发风控。
+
+字段：视频 → bvid / aid / title / author / mid / play / danmaku
+                duration_text / duration_sec / pubdate / published_at / url
+      UP 主 → mid / name / fans / archives / level / sign / official / url
+      --desc 追加 → desc（作者简介）/ stats{play,danmaku,reply,favorite,coin,share,like}
+
+例：bcli search "露营 装备" -n 5
+    bcli search "露营" --sort new --json
+    bcli search "影视飓风" --users
+    bcli search "露营" -n 3 --desc          # 带简介，适合直接看要不要点开

@@ -1,0 +1,2 @@
+usage: bilibili_cli info [-h] [--json] target
+bilibili_cli info: error: the following arguments are required: target

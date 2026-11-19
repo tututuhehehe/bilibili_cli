@@ -1,0 +1,10 @@
+bcli info <BV|链接> [--json]
+
+用途：下载前探路 —— 这条视频要不要钱、我能不能播、有哪些清晰度。
+
+输出：标题 / UP / 发布日期 / 时长 / 分P
+      🏷 内容类型：free(免费) | vip(会员专享) | charging(充电专属) | paid(付费)
+      🔑 账号权限：yes(可播放) | limited(仅低清晰度) | no(无权限) | unknown(需登录判断)
+      通道探测：app / tv 各自最高清晰度与轨道数
+
+例：bcli info BV1ocsd6jErz --json

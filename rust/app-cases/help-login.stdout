@@ -1,0 +1,7 @@
+bcli login              网页扫码登录 → cookie（决定能否 1080P / 字幕）
+bcli login --tv         云视听小电视扫码 → access_token（仅作为下载的降级通道）
+
+扫码位置：真终端里直接画 ASCII 二维码；非终端（脚本 / agent）生成 PNG 并自动打开。
+有效期：cookie 约数月，TV token 约数月；过期会明确提示重新登录。
+存储：~/.bilibili_cli/creds.json（权限 600）。
+兜底：环境变量 BILI_SESSDATA 可直接提供 cookie。

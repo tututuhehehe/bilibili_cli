@@ -1,0 +1,3 @@
+错误: 无法识别 'héllo wörld'：既不是 uid 也不是 BV 号
+  可用形式：数字 uid / space.bilibili.com/<uid>... / BV 号或视频链接
+  提示：链接里有 ? 时请用引号包住，否则 shell 会当成通配符报错

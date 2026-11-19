@@ -1,0 +1,12 @@
+bcli list <uid|链接> [-n 20] [--json] [--rights]
+
+  target    纯数字 uid，或 space.bilibili.com 链接（带 spm 参数也行）
+  -n        条数，默认 20
+  --json    机器可读（schema: bilibili_cli.v1）
+  --rights  逐条判定是否会员/充电专属（每条多一次请求，慢）
+
+例：bcli list 23947287 -n 5
+    bcli list "https://space.bilibili.com/23947287?spm_id_from=..." --json
+
+字段：id / title / url / published_at(ISO8601) / published_date
+      duration_sec / duration_text / views / cover / paid / badges

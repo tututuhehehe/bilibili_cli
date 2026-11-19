@@ -1,0 +1,4 @@
+bin.name = "bilibili_cli"
+args = ["search", "x", "--sort", "straße"]
+status.code = 2
+fs.sandbox = true

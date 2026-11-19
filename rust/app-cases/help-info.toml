@@ -1,0 +1,4 @@
+bin.name = "bilibili_cli"
+args = ["help", "info"]
+status.code = 0
+fs.sandbox = true

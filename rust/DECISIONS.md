@@ -82,3 +82,12 @@ Context: 用户确认（曾误建根级仓库，已拆除重排）。
 Decision: `moon_cli_or_tool/<tool>/` 各自独立 git 仓库；bupt-cli 保留原有历史。
 `rust/` 目录（含 cases/fixtures/tasks/docs）全量入库，`target/` 除外。
 Consequences: 根目录 AGENTS.md 为不入库的共享说明。
+
+## ADR-013 并行会话模型：opencode-go/glm-5.3:max
+Status: accepted (2026-11-19)
+Context: 用户指定；wave 1 的四个会话已由用户手动切换到该模型。
+Decision: 本移植的所有 subagent / rex 会话（含后续 wave 的接线与修复会话）
+统一使用 `opencode-go/glm-5.3:max`，新会话启动时显式传模型
+（`pi --model opencode-go/glm-5.3:max`），不依赖默认路由。
+Consequences: 协调者（主会话）模型不受此约束；此条同时已写入根 AGENTS.md。
+

@@ -1,0 +1,9 @@
+{
+  "schema": "rust-anything/app-cases@1",
+  "name": "bilibili_cli",
+  "run": [
+    "python3",
+    "bilibili_cli.py"
+  ],
+  "timeout_secs": 8
+}

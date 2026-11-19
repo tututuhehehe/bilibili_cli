@@ -1,0 +1,8 @@
+bcli doctor
+
+检查：curl / ffmpeg / qrencode / uv 是否就绪
+      网页 cookie 与 TV token 的登录态
+      投稿接口连通性（用样例 UP 实测）
+      gRPC 搜索接口连通性（用关键词「露营」实测 1 条）
+
+报错会拆到“网络 / TLS / 超时 / 风控 / 密钥 / 权益 / 接口改版 / 频率 / 服务端”。

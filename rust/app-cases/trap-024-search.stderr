@@ -1,0 +1,5 @@
+usage: bilibili_cli search [-h] [-n LIMIT]
+                           [--sort {totalrank,play,new,dm,stow}] [--users]
+                           [--desc] [--json]
+                           keyword
+bilibili_cli search: error: argument --sort: invalid choice: '' (choose from 'totalrank', 'play', 'new', 'dm', 'stow')
