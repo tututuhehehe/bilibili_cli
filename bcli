@@ -1,7 +1,7 @@
 #!/bin/sh
-# bcli — B站取用工具入口：优先 Rust 版（rust/app），无构建产物时回落 Python 原版
+# bcli — B站取用工具入口：优先 Rust 单二进制，无构建产物时回落 legacy Python
 d="$(dirname "$0")"
 if [ -x "$d/rust/app/target/release/bcli" ]; then
   exec "$d/rust/app/target/release/bcli" "$@"
 fi
-exec python3 "$d/bilibili_cli.py" "$@"
+exec python3 "$d/legacy/bilibili_cli.py" "$@"
