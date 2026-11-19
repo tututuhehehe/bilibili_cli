@@ -1,0 +1,10 @@
+.DS_Store
+# pi agent 任务记录，不属于源码
+.pi/
+__pycache__/
+*.pyc
+# 凭据永不入库（真凭据在 ~/.bilibili_cli/，此处仅是保险网）
+creds.json
+*.cookies
+# Rust 构建产物（rust-anything 移植期）
+target/
