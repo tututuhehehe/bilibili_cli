@@ -38,6 +38,14 @@ impl<'a> FetchSpec<'a> {
         self.referer = r;
         self
     }
+    pub fn cookie(mut self, c: &'a str) -> Self {
+        self.cookie = c;
+        self
+    }
+    pub fn channel(mut self, c: &'static str) -> Self {
+        self.channel = c;
+        self
+    }
 }
 
 fn endpoint_of(url: &str) -> String {

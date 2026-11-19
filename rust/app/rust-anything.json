@@ -4,7 +4,8 @@
   "commands": [
     "help",
     "search",
-    "list"
+    "list",
+    "info"
   ],
   "units": [
     {
@@ -24,6 +25,15 @@
         "list"
       ],
       "switch": "RUST_ANYTHING_UNIT_SIGN"
+    },
+    {
+      "name": "play",
+      "crate": "play-rs",
+      "path": "../play",
+      "commands": [
+        "info"
+      ],
+      "switch": "RUST_ANYTHING_UNIT_PLAY"
     }
   ]
 }

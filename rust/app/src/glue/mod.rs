@@ -2,6 +2,8 @@
 //! 逐字对齐 bilibili_cli.py 的 CliError / report / curl / grpc_call。
 
 pub mod curl;
+pub mod creds;
 pub mod err;
 pub mod grpc;
 pub mod http;
+pub mod play;

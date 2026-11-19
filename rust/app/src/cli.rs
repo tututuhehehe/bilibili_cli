@@ -68,4 +68,15 @@ pub fn command() -> Command {
                 .arg(Arg::new("json").long("json").action(ArgAction::SetTrue))
                 .arg(Arg::new("rights").long("rights").action(ArgAction::SetTrue)),
         )
+        .subcommand(
+            Command::new("info")
+                .disable_help_flag(true)
+                .arg(
+                    Arg::new("target")
+                        .required(true)
+                        .num_args(1)
+                        .value_parser(value_parser!(OsString)),
+                )
+                .arg(Arg::new("json").long("json").action(ArgAction::SetTrue)),
+        )
 }

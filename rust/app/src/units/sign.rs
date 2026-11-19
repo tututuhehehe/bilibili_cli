@@ -9,9 +9,9 @@ use std::time::Duration;
 use clap::ArgMatches;
 use parse::port as parse_port;
 use play::port as play_port;
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 
-use crate::glue::err::{fail_exit, Failure, SCHEMA};
+use crate::glue::err::{Failure, SCHEMA, fail_exit};
 use crate::glue::http::{user_name, user_videos, view};
 
 pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
@@ -31,10 +31,7 @@ pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
 }
 
 fn s_of(v: &Value, k: &str) -> String {
-    v.get(k)
-        .and_then(|x| x.as_str())
-        .unwrap_or("")
-        .to_string()
+    v.get(k).and_then(|x| x.as_str()).unwrap_or("").to_string()
 }
 fn i64_of(v: &Value, k: &str) -> i64 {
     v.get(k).and_then(|x| x.as_i64()).unwrap_or(0)
@@ -82,7 +79,10 @@ fn cmd_list(target: &str, n: i64, as_json: bool, rights: bool) -> Result<u32, Fa
         row.insert("cover".into(), json!(s_of(&it, "cover")));
         row.insert(
             "paid".into(),
-            json!(it.get("is_ugcpay").is_some_and(|x| x.as_bool().unwrap_or(false))),
+            json!(
+                it.get("is_ugcpay")
+                    .is_some_and(|x| x.as_bool().unwrap_or(false))
+            ),
         );
         let badges: Vec<Value> = it
             .get("badges")
@@ -140,12 +140,19 @@ fn cmd_list(target: &str, n: i64, as_json: bool, rights: bool) -> Result<u32, Fa
         return Ok(0);
     }
 
-    let display = if name.is_empty() { uid.clone() } else { name.clone() };
+    let display = if name.is_empty() {
+        uid.clone()
+    } else {
+        name.clone()
+    };
     let total = res
         .get("total")
         .and_then(|x| x.as_i64())
         .unwrap_or(items.len() as i64);
-    println!("{display}（uid {uid}）共 {total} 个投稿 · 最新 {} 条", items.len());
+    println!(
+        "{display}（uid {uid}）共 {total} 个投稿 · 最新 {} 条",
+        items.len()
+    );
     println!();
     for v in &items {
         let date = s_of(v, "published_date");
