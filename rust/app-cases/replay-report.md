@@ -2,8 +2,8 @@
 
 Build: `rust/app/target/release/bcli`
 
-Passed: 122/122
+Passed: 155/155
 
-Fallback rate: 0.0% (0/122 cases answered by the original)
+Fallback rate: 0.0% (0/155 cases answered by the original)
 
 Every case matches.

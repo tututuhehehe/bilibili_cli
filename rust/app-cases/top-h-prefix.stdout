@@ -1,0 +1,16 @@
+usage: bilibili_cli [-h] {login,list,search,info,dl,doctor,help} ...
+
+B 站取用工具：登录 / 列投稿 / 看详情 / 下载（无状态，不含订阅逻辑）
+
+positional arguments:
+  {login,list,search,info,dl,doctor,help}
+    login               扫码登录（默认网页；--tv 为云视听小电视）
+    list                列出某 UP 主近 N 条投稿
+    search              按关键词搜视频（--users 搜 UP 主）
+    info                单视频详情：分P / 清晰度 / 各通道可用性
+    dl                  下载视频或音频（app 首选，tv 降级备用）
+    doctor              环境与登录态自检
+    help                查看帮助（bcli help [command]）
+
+optional arguments:
+  -h, --help            show this help message and exit

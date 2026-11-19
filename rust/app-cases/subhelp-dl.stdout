@@ -1,0 +1,19 @@
+usage: bilibili_cli dl [-h] [--audio] [--quality QUALITY]
+                       [--codec {avc,hevc,av1}] [--parallel N] [-o OUT]
+                       [--subs] [--keep-parts] [--json]
+                       target
+
+positional arguments:
+  target
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --audio               只下音频（m4a）
+  --quality QUALITY     最高清晰度，如 1080P / 4K / 720P（默认最高可用）
+  --codec {avc,hevc,av1}
+                        视频编码偏好
+  --parallel N          分段并行下载数（0/1 关闭）
+  -o OUT, --out OUT     输出根目录（默认 /Users/limoon/Documents/bilibili_content）
+  --subs                同时保存字幕（srt）
+  --keep-parts          保留下载的临时分轨
+  --json

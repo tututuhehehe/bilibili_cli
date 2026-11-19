@@ -22,7 +22,15 @@ pub fn which(name: &str) -> Option<PathBuf> {
             continue;
         }
         let cand = Path::new(dir).join(name);
-        if cand.is_file() {
+        // shutil.which 语义：存在且可执行（任一 x 位）
+        if cand.is_file()
+            && std::fs::metadata(&cand)
+                .map(|m| {
+                    use std::os::unix::fs::PermissionsExt;
+                    m.permissions().mode() & 0o111 != 0
+                })
+                .unwrap_or(false)
+        {
             return Some(cand);
         }
     }
@@ -305,6 +313,36 @@ fn concat_parts(parts: &[PathBuf], dest: &Path, total: u64) -> Result<(), String
     Ok(())
 }
 
+/// 把 [0, total) 均分为 n 段闭区间（求和恒等于 total，段长差 ≤1）。
+fn segments(total: u64, n: u64) -> Vec<(u64, u64)> {
+    (0..n)
+        .map(|i| (total * i / n, total * (i + 1) / n - 1))
+        .collect()
+}
+
+#[cfg(test)]
+mod segment_tests {
+    use super::*;
+
+    #[test]
+    fn covers_exactly_and_monotonic() {
+        for &(total, n) in &[
+            (100u64, 3u64),
+            (33_554_433, 4),
+            (33_554_433, 8),
+            (u64::from(32 * 1024 * 1024), 8),
+            (7, 4),
+            (4 * 1024 * 1024, 8),
+        ] {
+            let segs = segments(total, n);
+            assert_eq!(segs.len(), n as usize);
+            assert_eq!(segs.iter().map(|(s, e)| e - s + 1).sum::<u64>(), total);
+            assert!(segs.iter().all(|(s, e)| s <= e));
+            assert!(segs.windows(2).all(|w| w[0].1 + 1 == w[1].0));
+        }
+    }
+}
+
 /// 分段并行下载一条流（ADR-014）。
 /// parallel ≤ 1 / 文件小于阈值 / 无 Range 支持 → 单流；
 /// 任一段最终失败或拼接异常 → 删全部半成品 → 回退单流（自带重试与必删语义）。
@@ -319,9 +357,7 @@ pub fn download_track(url: &str, dest: &Path, referer: &str, parallel: i64) -> R
         return curl_dl(url, dest, referer);
     }
     let n = parallel.clamp(2, MAX_PARALLEL) as u64;
-    let parts: Vec<(u64, u64)> = (0..n)
-        .map(|i| (total * i / n, total * (i + 1) / n - 1))
-        .collect();
+    let parts = segments(total, n);
     let part_paths: Vec<PathBuf> = (0..n)
         .map(|i| PathBuf::from(format!("{}.part{i}", dest.to_string_lossy())))
         .collect();

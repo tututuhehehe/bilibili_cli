@@ -9,7 +9,6 @@ pub const UA_APP: &str =
     "Mozilla/5.0 BiliDroid/7.73.0 (bbcallen@gmail.com) os/android model/Pixel up=1.0";
 pub const UA_TV: &str = "Mozilla/5.0 BiliDroid/7.73.0";
 
-#[derive(Default)]
 pub struct CurlSpec<'a> {
     pub ua: Option<&'a str>,
     pub referer: Option<&'a str>,
@@ -172,4 +171,10 @@ pub fn curl(url: &str, spec: &CurlSpec) -> Result<(String, i64), CliError> {
         return Ok((body.to_string(), http));
     }
     Ok((stdout, 0))
+}
+
+impl Default for CurlSpec<'_> {
+    fn default() -> Self {
+        Self::new()
+    }
 }

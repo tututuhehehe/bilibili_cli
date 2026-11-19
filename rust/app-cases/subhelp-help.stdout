@@ -1,0 +1,7 @@
+usage: bilibili_cli help [-h] [topic]
+
+positional arguments:
+  topic       命令名，如 dl；留空看总览
+
+optional arguments:
+  -h, --help  show this help message and exit

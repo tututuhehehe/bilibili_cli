@@ -8,7 +8,6 @@ use sign::port;
 use super::curl::{CurlSpec, UA_APP, curl};
 use super::err::{CliError, Failure, biz_code};
 
-#[derive(Default)]
 pub struct FetchSpec<'a> {
     pub ua: Option<&'a str>,
     pub referer: Option<&'a str>,
@@ -124,7 +123,7 @@ pub fn fetch_json(url: &str, spec: &FetchSpec) -> Result<Value, Failure> {
             m.to_string(),
             j.get("message")
                 .and_then(|m| m.as_str())
-                .unwrap_or("None")
+                .unwrap_or("")
                 .to_string(),
         ),
         None => {
@@ -147,13 +146,11 @@ pub fn fetch_json(url: &str, spec: &FetchSpec) -> Result<Value, Failure> {
             )
         }
     };
-    Err(CliError::new(cat, msg)
-        .endpoint(endpoint)
-        .http(http)
-        .code(code.unwrap_or(0))
-        .raw(raw)
-        .channel(spec.channel)
-        .into())
+    let mut e = CliError::new(cat, msg).endpoint(endpoint).http(http);
+    if let Some(c) = code {
+        e = e.code(c);
+    }
+    Err(e.raw(raw).channel(spec.channel).into())
 }
 
 /// `view`（bilibili_cli.py:456）。
@@ -268,5 +265,11 @@ pub fn nav_name(cookie: &str) -> Result<String, Failure> {
             .to_string()),
         Err(Failure::Cli(_)) => Ok(String::new()),
         Err(other) => Err(other),
+    }
+}
+
+impl Default for FetchSpec<'_> {
+    fn default() -> Self {
+        Self::new()
     }
 }

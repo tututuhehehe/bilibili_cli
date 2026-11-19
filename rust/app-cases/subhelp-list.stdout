@@ -1,0 +1,10 @@
+usage: bilibili_cli list [-h] [-n LIMIT] [--json] [--rights] target
+
+positional arguments:
+  target
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -n LIMIT, --limit LIMIT
+  --json
+  --rights              逐条判定是否会员/充电专属（每条多一次请求，慢）

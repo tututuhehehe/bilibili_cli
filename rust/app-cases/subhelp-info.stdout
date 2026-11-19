@@ -1,0 +1,8 @@
+usage: bilibili_cli info [-h] [--json] target
+
+positional arguments:
+  target
+
+optional arguments:
+  -h, --help  show this help message and exit
+  --json

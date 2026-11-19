@@ -6,7 +6,7 @@ use serde_json::{Value, json};
 use super::err::Failure;
 
 /// `CREDS_PATH`：`~/.bilibili_cli/creds.json`（模式 600，路径与字段不变，ADR-008）。
-fn creds_path() -> String {
+pub fn creds_path() -> String {
     let home = std::env::var("HOME").unwrap_or_default();
     format!("{home}/.bilibili_cli/creds.json")
 }

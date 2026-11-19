@@ -82,7 +82,7 @@ pub fn hint(category: &str) -> &'static str {
         "rights" => "这是账号权益问题，不是程序问题：大会员 / 充电 / 版权内容各自需要对应许可",
         "rate_limit" => "降低频率",
         "server" => "B 站侧问题，稍后再试",
-        _ => "把原始响应贴出来再判断",
+        _ => "",
     }
 }
 
@@ -110,7 +110,7 @@ pub fn report(e: &CliError) {
         let _ = writeln!(err, "  细节：{}", meta.join(" · "));
     }
     if !e.raw.is_empty() {
-        let flat: String = e.raw.split_whitespace().collect::<Vec<_>>().join(" ");
+        let flat: String = collapse_ws(&e.raw);
         let flat: String = flat.chars().take(160).collect();
         let _ = writeln!(err, "  原文：{flat}");
     }
@@ -118,6 +118,24 @@ pub fn report(e: &CliError) {
     if !h.is_empty() {
         let _ = writeln!(err, "  建议：{h}");
     }
+}
+
+/// Python `re.sub(r"\s+", " ", s)`：折叠空白为单空格，保留首尾（与 split+join 不同）。
+fn collapse_ws(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut in_ws = false;
+    for c in s.chars() {
+        if c.is_whitespace() {
+            if !in_ws {
+                out.push(' ');
+                in_ws = true;
+            }
+        } else {
+            out.push(c);
+            in_ws = false;
+        }
+    }
+    out
 }
 
 /// `CURL_EXIT`（bilibili_cli.py:70）。

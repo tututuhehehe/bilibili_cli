@@ -258,6 +258,18 @@ pub fn py_int(s: &str) -> Result<i64, String> {
     if s.is_empty() {
         return Err(invalid());
     }
+    // Python int() 下划线规则：只允许数字之间（首/尾/连续/小数点旁不合法）
+    if s.contains('_') {
+        let chars: Vec<char> = s.chars().collect();
+        let digit = |i: usize| i < chars.len() && nd_digit(chars[i]).is_some();
+        for (i, &c) in chars.iter().enumerate() {
+            if c == '_' && !(digit(i.saturating_sub(1)) && digit(i + 1)) {
+                return Err(invalid());
+            }
+        }
+        let stripped: String = s.chars().filter(|&c| c != '_').collect();
+        return py_int(&stripped);
+    }
     let body: String = s.chars().skip_while(|&c| nd_digit(c) == Some(0)).collect();
     if body.is_empty() {
         return Ok(0);

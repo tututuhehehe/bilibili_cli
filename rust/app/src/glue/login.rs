@@ -134,6 +134,8 @@ pub fn login_web() -> Result<u32, Failure> {
         }
         if code == Some(0) {
             let pairs = sign_port::_read_jar(jar.to_string()).map_err(Failure::Raw)?;
+            // cookie 已收进内存，jar 立即删除（不留 SESSDATA 在 /tmp）
+            let _ = std::fs::remove_file(jar);
             let sess = pairs.get("SESSDATA").and_then(|x| x.as_str()).unwrap_or("");
             if sess.is_empty() {
                 let raw = match pairs.as_object() {
@@ -171,7 +173,10 @@ pub fn login_web() -> Result<u32, Failure> {
             };
             println!("\n✓ 网页登录成功{who_disp}");
             let n = pairs.as_object().map(|o| o.len()).unwrap_or(0);
-            println!("  cookie 已存 ~/.bilibili_cli/creds.json（{n} 项，权限 600）");
+            println!(
+                "  cookie 已存 {}（{n} 项，权限 600）",
+                super::creds::creds_path()
+            );
             return Ok(0);
         }
         if code == Some(86038) {
@@ -255,7 +260,10 @@ pub fn login_tv() -> Result<u32, Failure> {
                 obj.insert("tv_saved_at".into(), json!(now_ts()));
             }
             save_creds(&c)?;
-            println!("\n✓ TV 登录成功，access_token 已存 ~/.bilibili_cli/creds.json");
+            println!(
+                "\n✓ TV 登录成功，access_token 已存 {}",
+                super::creds::creds_path()
+            );
             println!("  已作为降级备用通道（首选仍是 app）");
             return Ok(0);
         }

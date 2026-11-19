@@ -5,6 +5,12 @@ use clap::{Arg, ArgAction, Command, value_parser};
 /// The command `units::dispatch` gets when argv names no subcommand.
 pub const ROOT: &str = "bilibili_cli";
 
+/// clap 侧 int 校验 = Python `int()`（借 parse 单元 pystr：Nd 数字、数字间下划线）。
+/// frontspec 接受面与 clap 接受面由此保持一致（否则 Pass 后 clap 拒绝 → 内部失配）。
+fn py_int_cli(s: &str) -> Result<i64, String> {
+    parse::pystr::py_int(s)
+}
+
 fn rest() -> Arg {
     Arg::new("args")
         .num_args(0..)
@@ -32,6 +38,7 @@ pub fn command() -> Command {
                     Arg::new("keyword")
                         .required(true)
                         .num_args(1)
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(OsString)),
                 )
                 .arg(
@@ -40,7 +47,7 @@ pub fn command() -> Command {
                         .long("limit")
                         .default_value("20")
                         .allow_hyphen_values(true)
-                        .value_parser(value_parser!(i64)),
+                        .value_parser(py_int_cli),
                 )
                 .arg(
                     Arg::new("sort")
@@ -60,6 +67,7 @@ pub fn command() -> Command {
                     Arg::new("target")
                         .required(true)
                         .num_args(1)
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(OsString)),
                 )
                 .arg(
@@ -68,7 +76,7 @@ pub fn command() -> Command {
                         .long("limit")
                         .default_value("20")
                         .allow_hyphen_values(true)
-                        .value_parser(value_parser!(i64)),
+                        .value_parser(py_int_cli),
                 )
                 .arg(Arg::new("json").long("json").action(ArgAction::SetTrue))
                 .arg(Arg::new("rights").long("rights").action(ArgAction::SetTrue)),
@@ -81,6 +89,7 @@ pub fn command() -> Command {
                     Arg::new("target")
                         .required(true)
                         .num_args(1)
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(OsString)),
                 )
                 .arg(Arg::new("json").long("json").action(ArgAction::SetTrue)),
@@ -104,6 +113,7 @@ pub fn command() -> Command {
                     Arg::new("target")
                         .required(true)
                         .num_args(1)
+                        .allow_hyphen_values(true)
                         .value_parser(value_parser!(OsString)),
                 )
                 .arg(Arg::new("audio").long("audio").action(ArgAction::SetTrue))
@@ -125,7 +135,7 @@ pub fn command() -> Command {
                         .long("parallel")
                         .default_value("4")
                         .allow_hyphen_values(true)
-                        .value_parser(value_parser!(i64)),
+                        .value_parser(py_int_cli),
                 )
                 .arg(
                     Arg::new("out")

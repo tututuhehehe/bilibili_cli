@@ -39,7 +39,11 @@ fn percent_decode(s: &str) -> String {
     while i < bytes.len() {
         if bytes[i] == b'%'
             && i + 2 < bytes.len()
-            && let Ok(b) = u8::from_str_radix(&s[i + 1..i + 3], 16)
+            && let Ok(b) = u8::from_str_radix(
+                // 字节级取值：str 按字节偏移切多字节字符会 panic，这里先 from_utf8
+                std::str::from_utf8(&bytes[i + 1..i + 3]).unwrap_or(""),
+                16,
+            )
         {
             out.push(b);
             i += 3;
@@ -97,7 +101,11 @@ pub fn grpc_call(path: &str, payload: &[u8], timeout: u64) -> Result<Vec<u8>, Fa
         ])
         .arg(GRPC_HOST.to_string() + path)
         .output()
-        .map_err(|e| Failure::Raw(format!("curl 启动失败：{e}")))?;
+        .map_err(|e| {
+            let _ = fs::remove_file(&req_path);
+            let _ = fs::remove_file(&out_path);
+            Failure::Raw(format!("curl 启动失败：{e}"))
+        })?;
     let _ = fs::remove_file(&req_path);
     let body = fs::read(&out_path).unwrap_or_default();
     let _ = fs::remove_file(&out_path);
@@ -136,8 +144,8 @@ pub fn grpc_call(path: &str, payload: &[u8], timeout: u64) -> Result<Vec<u8>, Fa
         })?;
         let cat = match code {
             3 | 12 => "interface",
-            8 | 13 => "server",
-            14 => "server",
+            8 => "rate_limit",
+            13 | 14 => "server",
             _ => "unknown",
         };
         return Err(CliError::new(

@@ -1,0 +1,5 @@
+usage: bilibili_cli login [-h] [--tv]
+
+optional arguments:
+  -h, --help  show this help message and exit
+  --tv        走 TV 端登录，供 TV 通道使用

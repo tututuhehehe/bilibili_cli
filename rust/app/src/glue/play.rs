@@ -10,6 +10,14 @@ use super::http::{FetchSpec, fetch_json};
 
 /// 双通道取流。返回 `j["data"]`（缺失时空对象）。
 /// tv 需要 `tv_access_token`；app 用 cookie（登录态决定 1080P）。
+/// `j.get("data") or {}`：缺失或 null 都归空对象。
+fn non_null_data(j: &Value) -> Value {
+    match j.get("data") {
+        Some(v) if !v.is_null() => v.clone(),
+        _ => json!({}),
+    }
+}
+
 pub fn playurl(
     channel: &str,
     aid: i64,
@@ -56,7 +64,7 @@ pub fn playurl(
                 &format!("https://api.bilibili.com/x/tv/playurl?{q}"),
                 &FetchSpec::new().ua(UA_TV).referer(Some("")).channel("tv"),
             )?;
-            Ok(j.get("data").cloned().unwrap_or_else(|| json!({})))
+            Ok(non_null_data(&j))
         }
         "app" => {
             let mut params = json!({
@@ -88,7 +96,7 @@ pub fn playurl(
                     .cookie(&cookie)
                     .channel("app"),
             )?;
-            Ok(j.get("data").cloned().unwrap_or_else(|| json!({})))
+            Ok(non_null_data(&j))
         }
         other => Err(CliError::new("interface", format!("未知通道 {other}")).into()),
     }
