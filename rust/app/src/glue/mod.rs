@@ -4,3 +4,4 @@
 pub mod curl;
 pub mod err;
 pub mod grpc;
+pub mod http;

@@ -5,6 +5,9 @@ use std::process::Command;
 use super::err::{curl_exit, CliError};
 
 pub const UA_WEB: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
+pub const UA_APP: &str =
+    "Mozilla/5.0 BiliDroid/7.73.0 (bbcallen@gmail.com) os/android model/Pixel up=1.0";
+pub const UA_TV: &str = "Mozilla/5.0 BiliDroid/7.73.0";
 
 #[derive(Default)]
 pub struct CurlSpec<'a> {

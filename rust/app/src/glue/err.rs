@@ -159,6 +159,7 @@ pub fn biz_code(code: i64) -> Option<(&'static str, &'static str)> {
 pub enum Failure {
     Cli(CliError),
     Raw(String),
+    Die(String),
 }
 
 impl From<CliError> for Failure {
@@ -189,6 +190,10 @@ pub fn fail_exit(f: Failure) -> ExitCode {
         Failure::Raw(s) => {
             eprintln!("错误: 未预期错误: {s}");
             ExitCode::from(3)
+        }
+        Failure::Die(msg) => {
+            eprintln!("错误: {msg}");
+            ExitCode::from(2)
         }
     }
 }

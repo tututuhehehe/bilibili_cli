@@ -3,7 +3,8 @@
   "name": "bilibili_cli",
   "commands": [
     "help",
-    "search"
+    "search",
+    "list"
   ],
   "units": [
     {
@@ -14,6 +15,15 @@
         "search"
       ],
       "switch": "RUST_ANYTHING_UNIT_PROTO"
+    },
+    {
+      "name": "sign",
+      "crate": "sign-rs",
+      "path": "../sign",
+      "commands": [
+        "list"
+      ],
+      "switch": "RUST_ANYTHING_UNIT_SIGN"
     }
   ]
 }

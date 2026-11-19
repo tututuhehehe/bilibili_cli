@@ -49,4 +49,23 @@ pub fn command() -> Command {
                 .arg(Arg::new("desc").long("desc").action(ArgAction::SetTrue))
                 .arg(Arg::new("json").long("json").action(ArgAction::SetTrue)),
         )
+        .subcommand(
+            Command::new("list")
+                .disable_help_flag(true)
+                .arg(
+                    Arg::new("target")
+                        .required(true)
+                        .num_args(1)
+                        .value_parser(value_parser!(OsString)),
+                )
+                .arg(
+                    Arg::new("limit")
+                        .short('n')
+                        .long("limit")
+                        .default_value("20")
+                        .value_parser(value_parser!(i64)),
+                )
+                .arg(Arg::new("json").long("json").action(ArgAction::SetTrue))
+                .arg(Arg::new("rights").long("rights").action(ArgAction::SetTrue)),
+        )
 }

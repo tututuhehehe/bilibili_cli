@@ -5,9 +5,9 @@ use std::ffi::OsString;
 use std::process::ExitCode;
 
 use clap::ArgMatches;
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 
-use crate::glue::err::{fail_exit, Failure, SCHEMA};
+use crate::glue::err::{Failure, SCHEMA, fail_exit};
 use crate::glue::grpc::grpc_search;
 
 pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
@@ -32,10 +32,7 @@ pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
 }
 
 fn s_of(v: &Value, k: &str) -> String {
-    v.get(k)
-        .and_then(|x| x.as_str())
-        .unwrap_or("")
-        .to_string()
+    v.get(k).and_then(|x| x.as_str()).unwrap_or("").to_string()
 }
 fn i64_of(v: &Value, k: &str) -> i64 {
     v.get(k).and_then(|x| x.as_i64()).unwrap_or(0)
@@ -164,8 +161,10 @@ fn cmd_search(
                     let st = one.get("stats").cloned().unwrap_or(json!({}));
                     let favorite =
                         parse::port::_fmt_count(i64_of(&st, "favorite")).map_err(Failure::Raw)?;
-                    let like = parse::port::_fmt_count(i64_of(&st, "like")).map_err(Failure::Raw)?;
-                    let coin = parse::port::_fmt_count(i64_of(&st, "coin")).map_err(Failure::Raw)?;
+                    let like =
+                        parse::port::_fmt_count(i64_of(&st, "like")).map_err(Failure::Raw)?;
+                    let coin =
+                        parse::port::_fmt_count(i64_of(&st, "coin")).map_err(Failure::Raw)?;
                     println!("    收藏 {favorite} · 点赞 {like} · 投币 {coin}");
                 }
             }

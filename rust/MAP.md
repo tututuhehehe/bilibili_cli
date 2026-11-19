@@ -20,9 +20,11 @@
   回落日志为空（纯 Rust 路径）；kill switch `RUST_ANYTHING_UNIT_PROTO=original` 有效。
   注意：app-cases 里的 search 用例全是参数错路径，仍由 Python 回落答（符合 ADR-003），
   search 的真实行为由冒烟配对作证。
-- 待做：curl 封装已就绪，待接 list / info / dl / doctor / login；
-  view/user_videos/user_name；playurl；_curl_dl/_merge；_render_qr；load_creds/save_creds；
-  cmd_list/info/dl/doctor + clap 补全 + HELP 文本。
+- ✅ **list 已接线**（units/sign.rs + glue/http.rs）：fetch_json/view/user_videos/user_name 全部 Rust；
+  配对 3+3 次全一致（唯一一次差异是 views 实时计数漂移 68，复测归零）；
+  --rights 逐字节一致；kill switch `RUST_ANYTHING_UNIT_SIGN=original` 实测有效。
+- 待做：curl/err/http 胶水已就绪，待接 info / dl / doctor / login；
+  playurl；_curl_dl/_merge；_render_qr；load_creds/save_creds；HELP 文本。
 
 ## wave 3 冒烟（协调者跑，用户配合一次）
 search 1 次 / `list --json --rights` 1 次 / info 1 次 / doctor；
