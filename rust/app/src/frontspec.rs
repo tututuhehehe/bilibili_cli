@@ -351,10 +351,12 @@ fn parse_sub(cmd: &Cmd, toks: &[String]) -> Handled {
             i += 1;
             continue;
         }
-        if let Some(short) = t.strip_prefix("--") {
-            let (name, inline_val) = match short.split_once('=') {
+
+        // 长选项：--opt[=value]
+        if let Some(long) = t.strip_prefix("--") {
+            let (name, inline_val) = match long.split_once('=') {
                 Some((n, v)) => (n, Some(v)),
-                None => (short, None),
+                None => (long, None),
             };
             if name == "help" && inline_val.is_none() {
                 return Handled::Exit {
@@ -371,7 +373,9 @@ fn parse_sub(cmd: &Cmd, toks: &[String]) -> Handled {
                     continue;
                 }
             };
-            match opt.kind {
+            // 取值：内联（=value）或下一个 token（可吞负数字，不吞旗标）
+            let mut separate = false;
+            let value: Option<String> = match opt.kind {
                 Kind::Flag => {
                     if let Some(v) = inline_val {
                         return value_error(
@@ -380,72 +384,31 @@ fn parse_sub(cmd: &Cmd, toks: &[String]) -> Handled {
                             format!("ignored explicit argument {}", py_repr(v)),
                         );
                     }
-                    i += 1;
+                    None
                 }
-                Kind::Str => {
-                    let val = match inline_val {
-                        Some(v) => v.to_string(),
-                        None => match toks.get(i + 1) {
-                            Some(v) if !v.starts_with('-') || is_negative_number(v) => {
-                                i += 1;
-                                v.clone()
-                            }
-                            _ => {
-                                return value_error(
-                                    cmd,
-                                    opt.err_name,
-                                    "expected one argument".into(),
-                                );
-                            }
-                        },
-                    };
-                    let _ = val;
-                    i += 2;
-                }
-                Kind::Int => {
-                    let raw = match inline_val {
-                        Some(v) => v.to_string(),
-                        None => match toks.get(i + 1) {
-                            Some(v) if !v.starts_with('-') || is_negative_number(v) => {
-                                i += 1;
-                                v.clone()
-                            }
-                            _ => {
-                                return value_error(
-                                    cmd,
-                                    opt.err_name,
-                                    "expected one argument".into(),
-                                );
-                            }
-                        },
-                    };
-                    if raw.parse::<i64>().is_err() {
-                        return value_error(
-                            cmd,
-                            opt.err_name,
-                            format!("invalid int value: {}", py_repr(&raw)),
-                        );
+                Kind::Str | Kind::Int | Kind::Choice(_) => match inline_val {
+                    Some(v) => Some(v.to_string()),
+                    None => match toks.get(i + 1) {
+                        Some(v) if !v.starts_with('-') || is_negative_number(v) => {
+                            separate = true;
+                            Some(v.clone())
+                        }
+                        _ => return value_error(cmd, opt.err_name, "expected one argument".into()),
+                    },
+                },
+            };
+            if let Some(raw) = &value {
+                match opt.kind {
+                    Kind::Int => {
+                        if raw.parse::<i64>().is_err() {
+                            return value_error(
+                                cmd,
+                                opt.err_name,
+                                format!("invalid int value: {}", py_repr(raw)),
+                            );
+                        }
                     }
-                    i += 2;
-                }
-                Kind::Choice(list) => {
-                    let raw = match inline_val {
-                        Some(v) => v.to_string(),
-                        None => match toks.get(i + 1) {
-                            Some(v) if !v.starts_with('-') || is_negative_number(v) => {
-                                i += 1;
-                                v.clone()
-                            }
-                            _ => {
-                                return value_error(
-                                    cmd,
-                                    opt.err_name,
-                                    "expected one argument".into(),
-                                );
-                            }
-                        },
-                    };
-                    if !list.contains(&raw.as_str()) {
+                    Kind::Choice(list) if !list.contains(&raw.as_str()) => {
                         let joined = list
                             .iter()
                             .map(|c| format!("'{c}'"))
@@ -454,17 +417,20 @@ fn parse_sub(cmd: &Cmd, toks: &[String]) -> Handled {
                         return value_error(
                             cmd,
                             opt.err_name,
-                            format!("invalid choice: {} (choose from {joined})", py_repr(&raw)),
+                            format!("invalid choice: {} (choose from {joined})", py_repr(raw)),
                         );
                     }
-                    i += 2;
+                    _ => {}
                 }
             }
+            i += if separate { 2 } else { 1 };
             continue;
         }
+
+        // 短选项：-x、-xVALUE、-x VALUE
         if let Some(shorts) = t.strip_prefix('-') {
             if shorts.chars().all(|c| c.is_ascii_digit()) && !shorts.is_empty() {
-                // 纯负数字当作位置参数值处理（argparse 的负数匹配）
+                // 纯负数字 → 位置参数（argparse 负数匹配）
                 positionals.push(t.clone());
                 i += 1;
                 continue;
@@ -472,80 +438,89 @@ fn parse_sub(cmd: &Cmd, toks: &[String]) -> Handled {
             let mut chars = shorts.chars();
             let c = chars.next().unwrap_or(' ');
             let attached: String = chars.collect();
-            if let Some(opt) = cmd.opts.iter().find(|o| o.short == Some(c)) {
-                match opt.kind {
-                    Kind::Flag => {
-                        if !attached.is_empty() {
-                            extras.push(t.clone());
-                            i += 1;
-                            continue;
-                        }
-                        i += 1;
-                    }
-                    Kind::Str => {
-                        if !attached.is_empty() {
-                            let _ = attached;
-                            i += 1;
-                            continue;
-                        }
-                        return value_error(cmd, opt.err_name, "expected one argument".into());
-                    }
-                    Kind::Int | Kind::Choice(_) => {
-                        let raw = if !attached.is_empty() {
-                            attached
-                        } else {
-                            match toks.get(i + 1) {
-                                Some(v) if !v.starts_with('-') || is_negative_number(v) => {
-                                    i += 1;
-                                    v.clone()
-                                }
-                                _ => {
-                                    return value_error(
-                                        cmd,
-                                        opt.err_name,
-                                        "expected one argument".into(),
-                                    );
-                                }
-                            }
-                        };
-                        match opt.kind {
-                            Kind::Int => {
-                                if raw.parse::<i64>().is_err() {
-                                    return value_error(
-                                        cmd,
-                                        opt.err_name,
-                                        format!("invalid int value: {}", py_repr(&raw)),
-                                    );
-                                }
-                            }
-                            Kind::Choice(list) => {
-                                if !list.contains(&raw.as_str()) {
-                                    let joined = list
-                                        .iter()
-                                        .map(|c| format!("'{c}'"))
-                                        .collect::<Vec<_>>()
-                                        .join(", ");
-                                    return value_error(
-                                        cmd,
-                                        opt.err_name,
-                                        format!(
-                                            "invalid choice: {} (choose from {joined})",
-                                            py_repr(&raw)
-                                        ),
-                                    );
-                                }
-                            }
-                            _ => unreachable!(),
-                        }
-                        i += 1;
-                    }
-                }
-            } else {
+            let Some(opt) = cmd.opts.iter().find(|o| o.short == Some(c)) else {
                 extras.push(t.clone());
                 i += 1;
+                continue;
+            };
+            match opt.kind {
+                Kind::Flag => {
+                    if !attached.is_empty() {
+                        extras.push(t.clone());
+                    }
+                    i += 1;
+                    continue;
+                }
+                Kind::Str => {
+                    if attached.is_empty() {
+                        match toks.get(i + 1) {
+                            Some(v) if !v.starts_with('-') || is_negative_number(v) => {
+                                i += 2;
+                                continue;
+                            }
+                            _ => {
+                                return value_error(
+                                    cmd,
+                                    opt.err_name,
+                                    "expected one argument".into(),
+                                );
+                            }
+                        }
+                    }
+                    i += 1;
+                    continue;
+                }
+                Kind::Int | Kind::Choice(_) => {
+                    let had_attached = !attached.is_empty();
+                    let raw = if had_attached {
+                        attached
+                    } else {
+                        match toks.get(i + 1) {
+                            Some(v) if !v.starts_with('-') || is_negative_number(v) => v.clone(),
+                            _ => {
+                                return value_error(
+                                    cmd,
+                                    opt.err_name,
+                                    "expected one argument".into(),
+                                );
+                            }
+                        }
+                    };
+                    match opt.kind {
+                        Kind::Int => {
+                            if raw.parse::<i64>().is_err() {
+                                return value_error(
+                                    cmd,
+                                    opt.err_name,
+                                    format!("invalid int value: {}", py_repr(&raw)),
+                                );
+                            }
+                        }
+                        Kind::Choice(list) => {
+                            if !list.contains(&raw.as_str()) {
+                                let joined = list
+                                    .iter()
+                                    .map(|c| format!("'{c}'"))
+                                    .collect::<Vec<_>>()
+                                    .join(", ");
+                                return value_error(
+                                    cmd,
+                                    opt.err_name,
+                                    format!(
+                                        "invalid choice: {} (choose from {joined})",
+                                        py_repr(&raw)
+                                    ),
+                                );
+                            }
+                        }
+                        _ => unreachable!(),
+                    }
+                    i += if had_attached { 1 } else { 2 };
+                    continue;
+                }
             }
-            continue;
         }
+
         positionals.push(t.clone());
         i += 1;
     }
@@ -557,14 +532,13 @@ fn parse_sub(cmd: &Cmd, toks: &[String]) -> Handled {
         return missing_error(cmd, req);
     }
     // ③ 未识别（多余位置参数并入）
-    if positionals.len() > usize::from(cmd.required.is_some()) && cmd.name != "help" {
-        extras.extend(
-            positionals[usize::from(cmd.required.is_some())..]
-                .iter()
-                .cloned(),
-        );
-    } else if cmd.name == "help" && positionals.len() > 1 {
-        extras.extend(positionals[1..].iter().cloned());
+    let take = usize::from(cmd.required.is_some());
+    if cmd.name == "help" {
+        if positionals.len() > 1 {
+            extras.extend(positionals[1..].iter().cloned());
+        }
+    } else if positionals.len() > take {
+        extras.extend(positionals[take..].iter().cloned());
     }
     if !extras.is_empty() {
         return extras_error(&extras);
