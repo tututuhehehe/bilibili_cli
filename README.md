@@ -24,20 +24,18 @@ bcli                            # 本工具（Rust 二进制）
 
 ---
 
-## 优势（为什么用 bcli）
+## 优势
 
 > **定位：面向 agent 的 B 站取用事实源 + 极速单二进制下载器。**
 
-| 支柱 | 实证（同类项目拿不出的） |
+| 支柱 | 实测 |
 |---|---|
-| **Rust 轻量** | **1.7MB 单文件**、动态链接仅 `libSystem`、直接依赖只有 clap + serde_json、复用系统 curl/ffmpeg。对比：BBDown（C#，13.8k★）.NET 自包含几十 MB；bdl（Rust，476★）是 Tauri GUI 全家桶 |
-| **agent 友好** | 唯一提供**可机器依赖的行为契约**：`--json` schema 只增不删（`bilibili_cli.v1`）、语义退出码（0/2/3/4/5/6/7）、错误五层归因、`doctor` 自检、**156 条 trycmd 行为基线**（决策全程留痕于 git 历史） |
-| **极速下载** | CDN 压速场景实测 **9.3×**（176.7MB：89.3s → 9.6s），分段与单流 md5 逐字节一致；断点续传；半成品必删 |
-| **功能全面** | 搜索/登录/列表/详情/下载/自检 + 字幕 + 封面 + `.info.json`；见下方路线 |
-| 风控规避设计 | 匿名 **gRPC 搜索**（绕开 web REST 的 412）、app 签名接口（绕开 WBI）、下载流 UA 纪律实测——证据链都在本文 |
-| 本地优先 | 无守护进程、无状态、登录态 600、可任意 cron / agent 编排 |
-
-同类对比（2026-11 实测搜索）：BBDown（C#，下载器全家桶：番剧/弹幕/aria2）、yutto（Python）、bilibili-cli（Python，终端浏览）、bdl（Rust，GUI+安卓）、FastestBilibiliDownloader（Go，批量）。**纯 CLI + 事实源 + 单二进制**这个形态目前独占；弹幕/番剧/批量见「未来可做」。
+| **Rust 轻量** | 1.7MB 单文件二进制，动态链接仅 `libSystem`，直接依赖只有 clap 与 serde_json；复用系统 curl / ffmpeg |
+| **agent 友好** | 可机器依赖的行为契约：`--json` schema 只增不删（`bilibili_cli.v1`）、语义退出码（0/2/3/4/5/6/7）、错误五层归因、`doctor` 自检、156 条 trycmd 行为基线（开发决策全程留痕于 git 历史） |
+| **极速下载** | CDN 压速场景实测 9.3×（176.7MB：89.3s → 9.6s）；分段与单流产物 md5 逐字节一致；断点续传；半成品必删 |
+| **功能全面** | 搜索 / 登录 / 列表 / 详情 / 下载 / 自检，字幕、封面、`.info.json` 元数据 |
+| 风控友好 | 匿名 gRPC 搜索、app 签名接口、下载流 UA 纪律——全部实测验证并记录在本文 |
+| 本地优先 | 无守护进程、无状态、登录态文件 600 权限，可任意 cron / agent 编排 |
 
 ---
 
@@ -189,7 +187,7 @@ rust/app-cases/                156 条离线回归基线（trycmd 格式）
 
 - **[bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)** —— B 站接口社区知识库；本项目的端点与 appkey 生态知识受益于它（每一条接口语义本项目均已独立实测验证）。
 - **[rust-anything](https://github.com/erkamyaman/rust-anything)** —— Python → Rust 迁移工具链（bridge / record / replay / lift）；本仓库的行为基线与逐字节对齐工作流由它驱动。
-- **[BBDown](https://github.com/nilaoda/BBDown)**（nilaoda）、**[yutto](https://github.com/yutto-dev/yutto)**、**[bdl](https://github.com/Yuelioi/bdl)**（Yuelioi）—— 同类项目；`--cover` 的功能对标来自 bdl，优势对比章节的参照系。
+- **[BBDown](https://github.com/nilaoda/BBDown)**（nilaoda）、**[yutto](https://github.com/yutto-dev/yutto)**、**[bdl](https://github.com/Yuelioi/bdl)**（Yuelioi）—— 同类开源项目；`--cover` 的功能对标来自 bdl。
 - **[aaa1115910/bv](https://github.com/aaa1115910/bv)** —— 搜索卡字段映射的交叉核对参照（legacy-python 分支时期）。
 - 原版 Python 实现（`legacy-python` 分支）—— 本仓库由此移植而来。
 
