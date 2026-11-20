@@ -49,8 +49,9 @@ brew trust tututuhehehe/bcli     # 个人 tap 的标准信任步骤
 brew install bcli
 ```
 
-> tap 公式带预编译 bottle：安装即取 1.7MB 二进制，无需本地 Rust 工具链；
-> 也可 `brew install --build-from-source bcli` 从源码构建（需要 brew 的 rust）。
+> Apple Silicon 走 release 预编译二进制（726KB，秒装，无需 Rust 工具链）；
+> Intel Mac / Linux 自动落源码构建路径（`brew install --build-from-source bcli`）。
+> `ffmpeg` 与 `qrencode` 可选：`brew install ffmpeg qrencode`。
 
 **手动构建**：
 
