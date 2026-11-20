@@ -1,6 +1,6 @@
 [package]
 name = "parse-rs"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 publish = false
 description = "bilibili_cli 单元库（lift 后）"

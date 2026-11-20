@@ -28,7 +28,7 @@ pub enum Handled {
     /// 直接打印并退出
     Exit {
         code: u8,
-        stdout: &'static str,
+        stdout: std::borrow::Cow<'static, str>,
         stderr: String,
     },
     /// 合法命令，交给 clap → units
@@ -240,7 +240,7 @@ const CMDS: &[Cmd] = &[
 fn value_error(cmd: &Cmd, err_name: &str, msg: String) -> Handled {
     Handled::Exit {
         code: 2,
-        stdout: "",
+        stdout: std::borrow::Cow::Borrowed(""),
         stderr: format!(
             "{usage}bilibili_cli {name}: error: argument {err_name}: {msg}\n",
             usage = cmd.usage,
@@ -252,7 +252,7 @@ fn value_error(cmd: &Cmd, err_name: &str, msg: String) -> Handled {
 fn missing_error(cmd: &Cmd, arg: &str) -> Handled {
     Handled::Exit {
         code: 2,
-        stdout: "",
+        stdout: std::borrow::Cow::Borrowed(""),
         stderr: format!(
             "{usage}bilibili_cli {name}: error: the following arguments are required: {arg}\n",
             usage = cmd.usage,
@@ -271,7 +271,7 @@ fn extras_error(extras: &[(usize, String)]) -> Handled {
         .join(" ");
     Handled::Exit {
         code: 2,
-        stdout: "",
+        stdout: std::borrow::Cow::Borrowed(""),
         stderr: format!("{TOP_USAGE}bilibili_cli: error: unrecognized arguments: {joined}\n"),
     }
 }
@@ -302,9 +302,20 @@ fn consumable_value(v: &str) -> bool {
 }
 
 fn help_exit(cmd: &Cmd) -> Handled {
+    // `dl -h` 的 -o 默认值按 argparse 语义随用户 HOME 展开（原版 per-user 行为）；
+    // 其余命令的帮助文本无环境依赖，直接借用静态。
+    if cmd.name == "dl" {
+        let home = std::env::var("HOME").unwrap_or_else(|_| "~".into());
+        let rendered = cmd.subhelp.replace("__BCLI_HOME__", &home);
+        return Handled::Exit {
+            code: 0,
+            stdout: std::borrow::Cow::Owned(rendered),
+            stderr: String::new(),
+        };
+    }
     Handled::Exit {
         code: 0,
-        stdout: cmd.subhelp,
+        stdout: std::borrow::Cow::Borrowed(cmd.subhelp),
         stderr: String::new(),
     }
 }
@@ -345,7 +356,7 @@ fn ambiguous_error(cmd: &Cmd, tok: &str, name: &str) -> Handled {
     );
     Handled::Exit {
         code: 2,
-        stdout: "",
+        stdout: std::borrow::Cow::Borrowed(""),
         stderr: format!(
             "{usage}bilibili_cli {name}: error: ambiguous option: {tok} could match {joined}\n",
             usage = cmd.usage,
@@ -608,7 +619,7 @@ pub fn classify(argv: &[OsString]) -> Handled {
     if toks.is_empty() {
         return Handled::Exit {
             code: 2,
-            stdout: TOP_HELP,
+            stdout: std::borrow::Cow::Borrowed(TOP_HELP),
             stderr: String::new(),
         };
     }
@@ -622,7 +633,7 @@ pub fn classify(argv: &[OsString]) -> Handled {
         if t == "-h" || t == "--help" {
             return Handled::Exit {
                 code: 0,
-                stdout: TOP_HELP,
+                stdout: std::borrow::Cow::Borrowed(TOP_HELP),
                 stderr: String::new(),
             };
         }
@@ -640,12 +651,12 @@ pub fn classify(argv: &[OsString]) -> Handled {
                 return match inline_val {
                     None => Handled::Exit {
                         code: 0,
-                        stdout: TOP_HELP,
+                        stdout: std::borrow::Cow::Borrowed(TOP_HELP),
                         stderr: String::new(),
                     },
                     Some(v) => Handled::Exit {
                         code: 2,
-                        stdout: "",
+                        stdout: std::borrow::Cow::Borrowed(""),
                         stderr: format!(
                             "{TOP_USAGE}bilibili_cli: error: argument -h/--help: ignored explicit argument {}\n",
                             pystr::py_repr(v)
@@ -676,7 +687,7 @@ pub fn classify(argv: &[OsString]) -> Handled {
             .join(", ");
         return Handled::Exit {
             code: 2,
-            stdout: "",
+            stdout: std::borrow::Cow::Borrowed(""),
             stderr: format!(
                 "{TOP_USAGE}bilibili_cli: error: argument cmd: invalid choice: {} (choose from {joined})\n",
                 pystr::py_repr(first)

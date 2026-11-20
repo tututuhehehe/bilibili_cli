@@ -223,7 +223,7 @@ optional arguments:
   --codec {avc,hevc,av1}
                         视频编码偏好
   --parallel N          分段并行下载数（0/1 关闭）
-  -o OUT, --out OUT     输出根目录（默认 /Users/limoon/Documents/bilibili_content）
+  -o OUT, --out OUT     输出根目录（默认 __BCLI_HOME__/Documents/bilibili_content）
   --subs                同时保存字幕（srt）
   --keep-parts          保留下载的临时分轨
   --json

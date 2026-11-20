@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "bilibili_cli"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "clap",
  "parse-rs",
@@ -151,7 +151,7 @@ checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
 name = "parse-rs"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -159,7 +159,7 @@ dependencies = [
 
 [[package]]
 name = "play-rs"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -176,7 +176,7 @@ dependencies = [
 
 [[package]]
 name = "proto-rs"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -237,7 +237,7 @@ dependencies = [
 
 [[package]]
 name = "sign-rs"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
