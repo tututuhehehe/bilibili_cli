@@ -39,6 +39,31 @@ bcli                            # 本工具（Rust 二进制）
 
 ---
 
+## 安装
+
+**Homebrew（macOS / Apple Silicon）**：
+
+```bash
+brew tap tututuhehehe/bcli
+brew trust tututuhehehe/bcli     # 个人 tap 的标准信任步骤
+brew install bcli
+```
+
+> tap 公式带预编译 bottle：安装即取 1.7MB 二进制，无需本地 Rust 工具链；
+> 也可 `brew install --build-from-source bcli` 从源码构建（需要 brew 的 rust）。
+
+**手动构建**：
+
+```bash
+git clone https://github.com/tututuhehehe/bilibili_cli && cd bilibili_cli
+cd rust/app && cargo build --release
+# 产物 rust/app/target/release/bcli；或直接用仓库根的 bcli 启动脚本
+```
+
+外部运行时依赖：系统 `curl`（macOS 自带）、`ffmpeg`（`brew install ffmpeg`，仅视频合需要；纯音频不需要）、可选 `qrencode`（终端二维码，缺失时登录会打印链接）。
+
+---
+
 ## 构建与依赖
 
 ```bash
