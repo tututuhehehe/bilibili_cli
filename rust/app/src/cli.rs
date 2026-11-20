@@ -117,6 +117,7 @@ pub fn command() -> Command {
                         .value_parser(value_parser!(OsString)),
                 )
                 .arg(Arg::new("audio").long("audio").action(ArgAction::SetTrue))
+                .arg(Arg::new("cover").long("cover").action(ArgAction::SetTrue))
                 .arg(
                     Arg::new("quality")
                         .long("quality")

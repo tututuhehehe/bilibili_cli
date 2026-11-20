@@ -1,0 +1,5 @@
+usage: bilibili_cli dl [-h] [--audio] [--cover] [--quality QUALITY]
+                       [--codec {avc,hevc,av1}] [--parallel N] [-o OUT]
+                       [--subs] [--keep-parts] [--json]
+                       target
+bilibili_cli dl: error: ambiguous option: --co=1 could match --cover, --codec

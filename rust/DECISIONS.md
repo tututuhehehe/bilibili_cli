@@ -111,3 +111,13 @@ Context: lift 完成后原版仅作参照；用户指示删出 main、放独立�
 Decision: 分支 legacy-python 指向 c88cd8a（纯 Python 时代的完整仓库）；
 main 移除 legacy/ 目录，bcli shim 不再回落 Python（未构建时提示构建命令）。
 Consequences: main 是纯 Rust 单一实现；需要对照 Python 行为时 checkout legacy-python。
+
+## ADR-017 dl 新增 --cover（用户批准，A 项）
+Status: accepted (2026-11-20)
+Context: 对标 bdl 的内容覆盖面；用户指定只做封面一项（其余借鉴项不做）。
+Decision: `--cover` 同时保存封面 jpg（来源 view.pic，与媒体同名）；
+`.info.json` 新增 `cover` 字段（URL，schema 只增不删的第一次行使）；
+封面下载失败仅 stderr 告警、退出码不变（主产物完整优先，agent 不应因封面重试整个下载）。
+dl 家族 usage/帮助/歧义基线随复刻器重录（含新用例 ambiguous-dl-co：--co 双义）。
+Consequences: `--co` 成为 cover/codec 的歧义前缀（报 ambiguous，已钉基线）；
+legacy-python 分支的对照输出自此不含 cover 字段（预期差异）。

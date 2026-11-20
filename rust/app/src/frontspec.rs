@@ -172,6 +172,12 @@ const CMDS: &[Cmd] = &[
                 err_name: "--audio",
             },
             Opt {
+                long: "cover",
+                short: None,
+                kind: Kind::Flag,
+                err_name: "--cover",
+            },
+            Opt {
                 long: "quality",
                 short: None,
                 kind: Kind::Str,
@@ -324,10 +330,19 @@ fn find_long<'a>(cmd: &'a Cmd, name: &str) -> Result<Option<&'a Opt>, ()> {
     }
 }
 
-/// argparse `ambiguous option`：隐式 `--help` 排最前，其后按声明序。
-fn ambiguous_error(cmd: &Cmd, tok: &str) -> Handled {
-    let mut names = vec!["--help".to_string()];
-    names.extend(cmd.opts.iter().map(|o| format!("--{}", o.long)));
+/// argparse `ambiguous option`：只列**匹配**的选项——隐式 `--help`（若前缀命中）最前，
+/// 其后按声明序（探针：--co → "could match --cover, --codec"）。
+fn ambiguous_error(cmd: &Cmd, tok: &str, name: &str) -> Handled {
+    let mut names: Vec<String> = Vec::new();
+    if "help".starts_with(name) {
+        names.push("--help".to_string());
+    }
+    names.extend(
+        cmd.opts
+            .iter()
+            .filter(|o| o.long.starts_with(name))
+            .map(|o| format!("--{}", o.long)),
+    );
     Handled::Exit {
         code: 2,
         stdout: "",
@@ -416,7 +431,7 @@ fn parse_sub(
                     i += 1;
                     continue;
                 }
-                Err(()) => return ambiguous_error(cmd, t),
+                Err(()) => return ambiguous_error(cmd, t, name),
             };
             let mut separate = false;
             let value: Option<String> = match opt.kind {

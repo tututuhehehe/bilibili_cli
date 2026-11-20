@@ -36,6 +36,7 @@ pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
                 .cloned()
                 .unwrap_or_else(|| "avc".into());
             let parallel = *matches.get_one::<i64>("parallel").unwrap_or(&4);
+            let cover = matches.get_flag("cover");
             let out_dir = matches
                 .get_one::<OsString>("out")
                 .map(|s| s.to_string_lossy().into_owned());
@@ -49,6 +50,7 @@ pub fn run(command: &str, matches: &ArgMatches) -> ExitCode {
                 matches.get_flag("keep_parts"),
                 as_json,
                 parallel,
+                cover,
             ) {
                 Ok(code) => ExitCode::from(code as u8),
                 Err(f) => fail_exit(f),
@@ -314,6 +316,7 @@ fn cmd_dl(
     keep_parts: bool,
     as_json: bool,
     parallel: i64,
+    cover: bool,
 ) -> Result<u32, Failure> {
     let t = match parse_port::parse_target(target.to_string()) {
         Ok(v) => v,
@@ -544,6 +547,10 @@ fn cmd_dl(
     );
     meta.insert("file".into(), json!(out_str));
     meta.insert(
+        "cover".into(),
+        json!(d.get("pic").and_then(|x| x.as_str()).unwrap_or("")),
+    );
+    meta.insert(
         "downloaded_at".into(),
         json!(parse_port::iso(now_ts()).map_err(Failure::Raw)?),
     );
@@ -558,6 +565,25 @@ fn cmd_dl(
     )
     .map_err(|e| Failure::Raw(format!("{e}")))?;
 
+    if cover {
+        let pic = d.get("pic").and_then(|x| x.as_str()).unwrap_or("");
+        if !pic.is_empty() {
+            let cpath = base.join(format!("{stem}.jpg"));
+            match download_track(pic, &cpath, &referer, 1) {
+                Ok(_) => println!(
+                    "  封面 {}",
+                    cpath
+                        .file_name()
+                        .map(|n| n.to_string_lossy().into_owned())
+                        .unwrap_or_default()
+                ),
+                Err(Failure::Cli(e)) => {
+                    eprintln!("  · 封面下载失败：{}（不影响主产物）", e.summary);
+                }
+                Err(other) => return Err(other),
+            }
+        }
+    }
     if subs {
         let stem_path = match side.rsplit_once('.') {
             Some((head, _)) => head.to_string(),

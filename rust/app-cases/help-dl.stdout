@@ -1,6 +1,7 @@
-bcli dl <BV|链接> [--audio] [--quality Q] [--codec C] [--parallel N] [--subs] [--keep-parts] [-o DIR] [--json]
+bcli dl <BV|链接> [--audio] [--cover] [--quality Q] [--codec C] [--parallel N] [--subs] [--keep-parts] [-o DIR] [--json]
 
   --audio        只下音频 m4a（做笔记最快，体积约 1/10）
+  --cover        同时保存封面 jpg（.info.json 的 cover 字段即其来源）
   --quality      最高清晰度：1080P / 720P / 480P / 4K，默认最高可用
   --codec        视频编码偏好 avc | hevc | av1（默认 avc，兼容性最好）
   --parallel     分段并行下载数（默认 4；0/1=单流，上限 8，仅 ≥32MB 生效）

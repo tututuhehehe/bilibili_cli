@@ -1,4 +1,4 @@
-usage: bilibili_cli dl [-h] [--audio] [--quality QUALITY]
+usage: bilibili_cli dl [-h] [--audio] [--cover] [--quality QUALITY]
                        [--codec {avc,hevc,av1}] [--parallel N] [-o OUT]
                        [--subs] [--keep-parts] [--json]
                        target

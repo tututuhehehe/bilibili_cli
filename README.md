@@ -24,6 +24,23 @@ bcli                            # 本工具（Rust 二进制）
 
 ---
 
+## 优势（为什么用 bcli）
+
+> **定位：面向 agent 的 B 站取用事实源 + 极速单二进制下载器。**
+
+| 支柱 | 实证（同类项目拿不出的） |
+|---|---|
+| **Rust 轻量** | **1.7MB 单文件**、动态链接仅 `libSystem`、直接依赖只有 clap + serde_json、复用系统 curl/ffmpeg。对比：BBDown（C#，13.8k★）.NET 自包含几十 MB；bdl（Rust，476★）是 Tauri GUI 全家桶 |
+| **agent 友好** | 唯一提供**可机器依赖的行为契约**：`--json` schema 只增不删（`bilibili_cli.v1`）、语义退出码（0/2/3/4/5/6/7）、错误五层归因、`doctor` 自检、**156 条 trycmd 行为基线** + ADR 全程决策记录 |
+| **极速下载** | CDN 压速场景实测 **9.3×**（176.7MB：89.3s → 9.6s），分段与单流 md5 逐字节一致；断点续传；半成品必删 |
+| **功能全面** | 搜索/登录/列表/详情/下载/自检 + 字幕 + 封面 + `.info.json`；见下方路线 |
+| 风控规避设计 | 匿名 **gRPC 搜索**（绕开 web REST 的 412）、app 签名接口（绕开 WBI）、下载流 UA 纪律实测——证据链都在本文 |
+| 本地优先 | 无守护进程、无状态、登录态 600、可任意 cron / agent 编排 |
+
+同类对比（2026-11 实测搜索）：BBDown（C#，下载器全家桶：番剧/弹幕/aria2）、yutto（Python）、bilibili-cli（Python，终端浏览）、bdl（Rust，GUI+安卓）、FastestBilibiliDownloader（Go，批量）。**纯 CLI + 事实源 + 单二进制**这个形态目前独占；弹幕/番剧/批量见「未来可做」。
+
+---
+
 ## 构建与依赖
 
 ```bash
@@ -42,18 +59,20 @@ bcli search <关键词> [-n 20] [--sort X] [--users] [--desc] [--json]
 bcli login                     # 网页扫码（决定 1080P / 字幕）；login --tv 走 TV 端
 bcli list <uid|链接> [-n 20] [--json] [--rights]
 bcli info <BV|链接> [--json]
-bcli dl <BV|链接> [--audio] [--quality Q] [--codec C] [--parallel N] [--subs] [--keep-parts] [-o DIR] [--json]
+bcli dl <BV|链接> [--audio] [--cover] [--quality Q] [--codec C] [--parallel N] [--subs] [--keep-parts] [-o DIR] [--json]
 bcli doctor
 ```
 
 `--parallel N`：分段并行下载（默认 4；`0/1`=单流；上限 8；仅 ≥32MB 生效，音频同规则）。
 实测同节点单连接被 CDN 压速时可达 **9.3×** 提速；分段与单流产物 md5 逐字节一致。
+`--cover`：同时保存封面 jpg（`.info.json` 的 `cover` 字段即其来源；封面失败只告警不影响主产物）。
 
 ## 产物与 `.info.json`
 
 ```
 ~/Documents/bilibili_content/<UP主>/<YYYY-MM-DD>_<标题>.mp4   # 或 .m4a
                                    同名 .info.json
+                                   同名 .jpg                    # --cover 时
 ```
 
 `.info.json` 关键字段（schema `bilibili_cli.v1`，字段只增不删）：
@@ -62,6 +81,7 @@ bcli doctor
 {
   "schema": "bilibili_cli.v1",
   "id": "BV...", "title": "...", "url": "...",
+  "cover": "http://i0.hdslb.com/bfs/archive/….jpg",
   "author": {"uid": "...", "name": "..."},
   "published_at": "2026-10-20T11:00:00+08:00", "published_date": "2026-10-20",
   "duration_sec": 2369, "duration_text": "39:29",

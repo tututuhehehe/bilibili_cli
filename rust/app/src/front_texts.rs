@@ -1,6 +1,6 @@
 //! 前端文本层：由 fixture / argparse 复刻器生成（lift 基线的一部分）。
 //! 大段文本逐字来自 app-cases/*.stdout（录自 Python 原版，复刻保真断言 0 失真）。
-//! dl 文本含 --parallel（ADR-014）。生成脚本：lift 提交说明。
+//! dl 文本含 --parallel / --cover（ADR-014/017）。生成脚本：lift 提交说明。
 #![allow(clippy::needless_raw_string_hashes)]
 
 pub const TOP_HELP: &str = r#"usage: bilibili_cli [-h] {login,list,search,info,dl,doctor,help} ...
@@ -112,9 +112,10 @@ pub const HELP_DETAIL_INFO: &str = r#"bcli info <BV|链接> [--json]
 例：bcli info BV1ocsd6jErz --json
 "#;
 
-pub const HELP_DETAIL_DL: &str = r#"bcli dl <BV|链接> [--audio] [--quality Q] [--codec C] [--parallel N] [--subs] [--keep-parts] [-o DIR] [--json]
+pub const HELP_DETAIL_DL: &str = r#"bcli dl <BV|链接> [--audio] [--cover] [--quality Q] [--codec C] [--parallel N] [--subs] [--keep-parts] [-o DIR] [--json]
 
   --audio        只下音频 m4a（做笔记最快，体积约 1/10）
+  --cover        同时保存封面 jpg（.info.json 的 cover 字段即其来源）
   --quality      最高清晰度：1080P / 720P / 480P / 4K，默认最高可用
   --codec        视频编码偏好 avc | hevc | av1（默认 avc，兼容性最好）
   --parallel     分段并行下载数（默认 4；0/1=单流，上限 8，仅 ≥32MB 生效）
@@ -206,7 +207,7 @@ optional arguments:
 pub const USAGE_INFO: &str = r#"usage: bilibili_cli info [-h] [--json] target
 "#;
 
-pub const SUBHELP_DL: &str = r#"usage: bilibili_cli dl [-h] [--audio] [--quality QUALITY]
+pub const SUBHELP_DL: &str = r#"usage: bilibili_cli dl [-h] [--audio] [--cover] [--quality QUALITY]
                        [--codec {avc,hevc,av1}] [--parallel N] [-o OUT]
                        [--subs] [--keep-parts] [--json]
                        target
@@ -217,6 +218,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --audio               只下音频（m4a）
+  --cover               同时保存封面（jpg）
   --quality QUALITY     最高清晰度，如 1080P / 4K / 720P（默认最高可用）
   --codec {avc,hevc,av1}
                         视频编码偏好
@@ -227,7 +229,7 @@ optional arguments:
   --json
 "#;
 
-pub const USAGE_DL: &str = r#"usage: bilibili_cli dl [-h] [--audio] [--quality QUALITY]
+pub const USAGE_DL: &str = r#"usage: bilibili_cli dl [-h] [--audio] [--cover] [--quality QUALITY]
                        [--codec {avc,hevc,av1}] [--parallel N] [-o OUT]
                        [--subs] [--keep-parts] [--json]
                        target

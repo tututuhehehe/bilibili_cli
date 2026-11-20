@@ -1,4 +1,4 @@
-usage: bilibili_cli dl [-h] [--audio] [--quality QUALITY]
+usage: bilibili_cli dl [-h] [--audio] [--cover] [--quality QUALITY]
                        [--codec {avc,hevc,av1}] [--parallel N] [-o OUT]
                        [--subs] [--keep-parts] [--json]
                        target
@@ -9,6 +9,7 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --audio               只下音频（m4a）
+  --cover               同时保存封面（jpg）
   --quality QUALITY     最高清晰度，如 1080P / 4K / 720P（默认最高可用）
   --codec {avc,hevc,av1}
                         视频编码偏好
