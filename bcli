@@ -1,7 +1,8 @@
 #!/bin/sh
-# bcli — B站取用工具入口：优先 Rust 单二进制，无构建产物时回落 legacy Python
+# bcli — B站取用工具入口：Rust 单二进制（未构建时提示构建命令）
 d="$(dirname "$0")"
 if [ -x "$d/rust/app/target/release/bcli" ]; then
   exec "$d/rust/app/target/release/bcli" "$@"
 fi
-exec python3 "$d/legacy/bilibili_cli.py" "$@"
+echo "错误: 未找到 Rust 二进制。先构建：cd $d/rust/app && cargo build --release" >&2
+exit 1

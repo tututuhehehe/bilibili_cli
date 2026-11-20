@@ -6,7 +6,7 @@ B 站取用工具：**搜 → 登录 → 列投稿 → 看详情 → 下载**。
 bcli                            # 本工具（Rust 二进制）
 ~/.bilibili_cli/creds.json      # 登录态（600）
 ~/Documents/bilibili_content/   # 下载产物
-legacy/bilibili_cli.py          # 原版 Python（仅作参照，不再日常使用）
+（Python 原版在 git 分支 legacy-python，main 仅 Rust）
 ```
 
 ---
@@ -29,7 +29,7 @@ legacy/bilibili_cli.py          # 原版 Python（仅作参照，不再日常使
 ```bash
 brew install ffmpeg qrencode    # ffmpeg 合并必需；qrencode 终端二维码（可选）
 cd rust/app && cargo build --release
-# 产物：rust/app/target/release/bcli；bcli 启动脚本优先用它，无产物时回落 legacy Python
+# 产物：rust/app/target/release/bcli；bcli 启动脚本优先执行它
 ```
 
 外部只依赖系统 `curl`（传输：TLS 指纹与真实浏览器同系 + 自带 HTTP/2/续传）、`ffmpeg`、可选 `qrencode`。**不依赖 Python 运行时。**

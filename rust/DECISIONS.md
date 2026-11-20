@@ -104,3 +104,10 @@ Range 0-0 探测大小，无 Range 支持回退单流；任一段 3 次整段重
 Consequences: 这是唯一超出 Python 原版的功能（用户批准）；
 **lift 时须同步更新 app-cases 里 dl 的 usage 行与 help-dl 文本**（加 --parallel），
 以及 argparse 模拟层用新 usage 行——已记入 MAP 待办。
+
+## ADR-016 Python 原版移至 legacy-python 分支
+Status: accepted (2026-11-20)
+Context: lift 完成后原版仅作参照；用户指示删出 main、放独立分支。
+Decision: 分支 legacy-python 指向 c88cd8a（纯 Python 时代的完整仓库）；
+main 移除 legacy/ 目录，bcli shim 不再回落 Python（未构建时提示构建命令）。
+Consequences: main 是纯 Rust 单一实现；需要对照 Python 行为时 checkout legacy-python。
