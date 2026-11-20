@@ -31,7 +31,7 @@ bcli                            # 本工具（Rust 二进制）
 | 支柱 | 实证（同类项目拿不出的） |
 |---|---|
 | **Rust 轻量** | **1.7MB 单文件**、动态链接仅 `libSystem`、直接依赖只有 clap + serde_json、复用系统 curl/ffmpeg。对比：BBDown（C#，13.8k★）.NET 自包含几十 MB；bdl（Rust，476★）是 Tauri GUI 全家桶 |
-| **agent 友好** | 唯一提供**可机器依赖的行为契约**：`--json` schema 只增不删（`bilibili_cli.v1`）、语义退出码（0/2/3/4/5/6/7）、错误五层归因、`doctor` 自检、**156 条 trycmd 行为基线** + ADR 全程决策记录 |
+| **agent 友好** | 唯一提供**可机器依赖的行为契约**：`--json` schema 只增不删（`bilibili_cli.v1`）、语义退出码（0/2/3/4/5/6/7）、错误五层归因、`doctor` 自检、**156 条 trycmd 行为基线**（决策全程留痕于 git 历史） |
 | **极速下载** | CDN 压速场景实测 **9.3×**（176.7MB：89.3s → 9.6s），分段与单流 md5 逐字节一致；断点续传；半成品必删 |
 | **功能全面** | 搜索/登录/列表/详情/下载/自检 + 字幕 + 封面 + `.info.json`；见下方路线 |
 | 风控规避设计 | 匿名 **gRPC 搜索**（绕开 web REST 的 412）、app 签名接口（绕开 WBI）、下载流 UA 纪律实测——证据链都在本文 |
@@ -165,11 +165,13 @@ appkey/appsec 为客户端内公开常量（源码 `glue/creds.rs`）。
 ## 开发
 
 ```
-rust/app            前门二进制（clap + frontspec + glue + units）
-rust/{proto,parse,play,sign}   纯单元库（gate ✓ 的行为基线在各自 cases.jsonl）
-rust/app-cases/     122 条离线回归基线（trycmd 格式）
-rust/DECISIONS.md   ADR 决策记录；rust/MAP.md 状态板
+rust/app                       前门二进制（clap + frontspec + glue + units）
+rust/{proto,parse,play,sign}   纯单元库（各含 cargo 测试与测试数据）
+rust/app-cases/                156 条离线回归基线（trycmd 格式）
 ```
+
+> 开发期的过程文件（ADR 决策记录、任务书、移植计划、行为录制档案）已按
+> 「main 只留成品」清理，全部保留在 git 历史，`git log` 可查。
 
 回归三件套：`cargo test`（五个 crate）· `cargo clippy -D warnings` ·
 `rust-anything app replay . --build rust/app/target/release/bcli`。
@@ -180,3 +182,14 @@ rust/DECISIONS.md   ADR 决策记录；rust/MAP.md 状态板
 - `follow`：拉关注列表初始化订阅（`x/relation/followings`，需登录）
 - 番剧：`playurl_type=2` + `ep_id`；`pgc/view/web/season` 看剧集
 - 笔记流水线：`bcli dl --audio` → `mlx-whisper` → LLM 结构化笔记
+
+---
+
+## 致谢
+
+- **[bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)** —— B 站接口社区知识库；本项目的端点与 appkey 生态知识受益于它（每一条接口语义本项目均已独立实测验证）。
+- **[rust-anything](https://github.com/erkamyaman/rust-anything)** —— Python → Rust 迁移工具链（bridge / record / replay / lift）；本仓库的行为基线与逐字节对齐工作流由它驱动。
+- **[BBDown](https://github.com/nilaoda/BBDown)**（nilaoda）、**[yutto](https://github.com/yutto-dev/yutto)**、**[bdl](https://github.com/Yuelioi/bdl)**（Yuelioi）—— 同类项目；`--cover` 的功能对标来自 bdl，优势对比章节的参照系。
+- **[aaa1115910/bv](https://github.com/aaa1115910/bv)** —— 搜索卡字段映射的交叉核对参照（legacy-python 分支时期）。
+- 原版 Python 实现（`legacy-python` 分支）—— 本仓库由此移植而来。
+
